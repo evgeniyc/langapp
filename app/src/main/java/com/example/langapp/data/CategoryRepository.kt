@@ -1,7 +1,11 @@
 package com.example.langapp.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import com.example.langapp.data.Category
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class CategoryRepository(private val categoryDao: CategoryDao) {
 
@@ -17,11 +21,13 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
         categoryDao.deleteCategory(category)
     }
 
-    fun getAllCategories(): Flow<List<Category>> {
-        return categoryDao.getAllCategories()
-    }
+    fun getAllCategories(): Flow<List<Category>> = flow {
+        delay(1000) // Задержка перед получением данных
+        emitAll(categoryDao.getAllCategories())
+    }.flowOn(Dispatchers.IO)
 
-    fun getCategoryById(id: Int): Flow<Category> {
-        return categoryDao.getCategoryById(id)
-    }
+    fun getCategoryById(id: Int): Flow<Category> = flow {
+        delay(1000) // Задержка перед получением данных
+        emitAll(categoryDao.getCategoryById(id))
+    }.flowOn(Dispatchers.IO)
 }

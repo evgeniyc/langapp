@@ -1,6 +1,11 @@
 package com.example.langapp.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class WordRepository(private val wordDao: WordDao) {
 
@@ -16,15 +21,18 @@ class WordRepository(private val wordDao: WordDao) {
         wordDao.deleteWord(word)
     }
 
-    fun getAllWords(): Flow<List<Word>> {
-        return wordDao.getAllWords()
-    }
+    fun getAllWords(): Flow<List<Word>> = flow {
+        delay(1000) // Задержка перед получением данных
+        emitAll(wordDao.getAllWords())
+    }.flowOn(Dispatchers.IO)
 
-    fun getWordById(id: Int): Flow<Word> {
-        return wordDao.getWordById(id)
-    }
+    fun getWordById(id: Int): Flow<Word> = flow {
+        delay(1000) // Задержка перед получением данных
+        emitAll(wordDao.getWordById(id))
+    }.flowOn(Dispatchers.IO)
 
-    fun getWordsByCategoryId(categoryId: Int): Flow<List<Word>> {
-        return wordDao.getWordsByCategoryId(categoryId)
-    }
+    fun getWordsByCategoryId(categoryId: Int): Flow<List<Word>> = flow {
+        delay(1000) // Задержка перед получением данных
+        emitAll(wordDao.getWordsByCategoryId(categoryId))
+    }.flowOn(Dispatchers.IO)
 }

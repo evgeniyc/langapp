@@ -1,9 +1,8 @@
-
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android) // Вернули
-    id("com.google.devtools.ksp")
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.android)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -55,7 +54,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx) // Переместили сюда
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -63,22 +62,21 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.compose.material.icons.core) // Раскомментировали
-    implementation(libs.androidx.compose.material.icons.extended) // Раскомментировали
-    implementation(libs.androidx.room.runtime) // Раскомментировали
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.lifecycle.livedata.ktx) // Раскомментировали
-    ksp(libs.androidx.room.compiler) // Оставили только один раз
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
-    testImplementation(platform(libs.androidx.compose.bom)) // Раскомментировали
+    testImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.androidx.savedstate)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom)) // Раскомментировали
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.runtime.livedata) // Или последнюю версию
 }

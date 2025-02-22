@@ -1,23 +1,36 @@
 package com.example.langapp.ui.viewmodels
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.langapp.data.Word
 import com.example.langapp.data.WordRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class WordViewModel(private val wordRepository: WordRepository) : ViewModel() {
 
-    val allWords: LiveData<List<Word>> = wordRepository.getAllWords().asLiveData()
+    private val _words = MutableStateFlow<List<Word>>(emptyList())
+    val words: StateFlow<List<Word>> = _words
 
-    fun getWordById(id: Int): LiveData<Word> {
-        return wordRepository.getWordById(id).asLiveData()
+    fun loadWordsByCategoryId(categoryId: Int) {
+        viewModelScope.launch {
+            wordRepository.getWordsByCategoryId(categoryId).collect {
+                _words.value = it
+            }
+        }
+    }
+    fun loadAllWords() {
+        viewModelScope.launch {
+            wordRepository.getAllWords().collect {
+                _words.value = it
+            }
+        }
     }
 
-    fun getWordsByCategoryId(categoryId: Int): LiveData<List<Word>> {
-        return wordRepository.getWordsByCategoryId(categoryId).asLiveData()
+    fun getWordById(id: Int): Flow<Word> {
+        return wordRepository.getWordById(id)
     }
 
     fun insertWord(word: Word) {

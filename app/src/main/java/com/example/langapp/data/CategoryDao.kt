@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoryDao {
     @Insert
-    suspend fun insertCategory(category: Category)
+    suspend fun insertCategory(category: Category): Long // <- Вот здесь нужно добавить : Long
 
     @Update
     suspend fun updateCategory(category: Category)
