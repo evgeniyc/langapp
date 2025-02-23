@@ -2,68 +2,61 @@ package com.example.langapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.langapp.data.AppDatabase
-import com.example.langapp.data.CategoryRepository
-import com.example.langapp.data.WordRepository
+import com.example.langapp.ui.AppViewModelProvider
+import com.example.langapp.ui.CategoryListViewModel
+import com.example.langapp.ui.WordListViewModel
 import com.example.langapp.ui.screens.CategoryListScreen
 import com.example.langapp.ui.screens.LearningScreen
 import com.example.langapp.ui.screens.WordListScreen
 import com.example.langapp.ui.theme.LangAppTheme
-import com.example.langapp.ui.viewmodels.CategoryViewModel
-import com.example.langapp.ui.viewmodels.CategoryViewModelFactory
-import com.example.langapp.ui.viewmodels.WordViewModelFactory
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun NavGraph(scope: CoroutineScope, modifier: Modifier = Modifier) {
+fun NavGraph(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    val context = LocalContext.current
-    val database = AppDatabase.getInstance(context, scope)
-    val categoryRepository = CategoryRepository(database.categoryDao())
-    val categoryViewModelFactory = CategoryViewModelFactory(categoryRepository)
-    val wordRepository = WordRepository(database.wordDao())
-    val wordViewModelFactory = WordViewModelFactory(wordRepository)
-    LangAppTheme { // Добавили LangAppTheme
+    LangAppTheme {
         NavHost(
             navController = navController,
             startDestination = "categoryList",
             modifier = modifier
         ) {
             composable("categoryList") {
-                val categoryViewModel: CategoryViewModel =
-                    viewModel(factory = categoryViewModelFactory)
+                val categoryListViewModel: CategoryListViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
                 CategoryListScreen(
                     navController = navController,
-                    categoryViewModel = categoryViewModel
+                    categoryListViewModel = categoryListViewModel
                 )
             }
             composable(
-                route = "wordList/{categoryId}",
-                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+                route = "wordList/{catId}",
+                arguments = listOf(navArgument("catId") { type = NavType.IntType })
             ) { backStackEntry ->
-                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
+                val catId = backStackEntry.arguments?.getInt("catId") ?: 0
+                val wordListViewModel: WordListViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
                 WordListScreen(
-                    categoryId = categoryId,
-                    wordViewModelFactory = wordViewModelFactory,
-                    navController = navController
+                    catId = catId, // Передаем catId
+                    wordListViewModel = wordListViewModel, // Передаем wordListViewModel
+                    navController = navController // Передаем navController
                 )
             }
             composable(
-                route = "learning/{categoryId}",
-                arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+                route = "learning/{catId}",
+                arguments = listOf(navArgument("catId") { type = NavType.IntType })
             ) { backStackEntry ->
-                val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
+                val catId = backStackEntry.arguments?.getInt("catId") ?: 0
+                val wordListViewModel: WordListViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
                 LearningScreen(
-                    categoryId = categoryId,
-                    wordViewModelFactory = wordViewModelFactory,
-                    navController = navController
+                    catId = catId, // Передаем catId
+                    wordListViewModel = wordListViewModel, // Передаем wordListViewModel
+                    navController = navController // Передаем navController
                 )
             }
         }

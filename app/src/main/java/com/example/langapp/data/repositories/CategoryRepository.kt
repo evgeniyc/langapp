@@ -1,5 +1,7 @@
-package com.example.langapp.data
+package com.example.langapp.data.repositories
 
+import com.example.langapp.data.database.CategoryDao
+import com.example.langapp.data.entities.Category
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -30,4 +32,16 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
         delay(1000) // Задержка перед получением данных
         emitAll(categoryDao.getCategoryById(id))
     }.flowOn(Dispatchers.IO)
+
+    fun getCategoriesByName(name: String): Flow<List<Category>> = categoryDao.getCategoriesByName(name).flowOn(Dispatchers.IO)
+
+    fun getCategoriesByTransl(transl: String): Flow<List<Category>> = categoryDao.getCategoriesByTransl(transl).flowOn(Dispatchers.IO)
+
+    fun getCategoriesByTranscr(transcr: String): Flow<List<Category>> = categoryDao.getCategoriesByTranscr(transcr).flowOn(Dispatchers.IO)
+
+    fun getCategoriesSortedByName(): Flow<List<Category>> = categoryDao.getCategoriesSortedByName().flowOn(Dispatchers.IO)
+
+    fun getCategoriesSortedByTransl(): Flow<List<Category>> = categoryDao.getCategoriesSortedByTransl().flowOn(Dispatchers.IO)
+
+    fun getCategoriesSortedByTranscr(): Flow<List<Category>> = categoryDao.getCategoriesSortedByTranscr().flowOn(Dispatchers.IO)
 }

@@ -2,7 +2,7 @@ package com.example.langapp.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.langapp.data.Word
+import com.example.langapp.data.entities.Word
 import com.example.langapp.data.WordRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

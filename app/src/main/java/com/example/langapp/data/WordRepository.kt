@@ -1,5 +1,7 @@
 package com.example.langapp.data
 
+import com.example.langapp.data.database.WordDao
+import com.example.langapp.data.entities.Word
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
