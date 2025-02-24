@@ -1,5 +1,6 @@
 package com.example.langapp.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,10 +38,13 @@ fun WordListScreen(
     wordListViewModel: WordListViewModel,
     navController: NavController
 ) {
+    Log.d("WordListScreen", "WordListScreen() started, catId = $catId")
     val words by wordListViewModel.wordListUiState.collectAsState()
 
     LaunchedEffect(key1 = catId) {
+        Log.d("WordListScreen", "LaunchedEffect started, catId = $catId")
         wordListViewModel.getWordsByCategoryId(catId)
+        Log.d("WordListScreen", "getWordsByCategoryId() called, catId = $catId")
     }
 
     Column(
@@ -63,7 +67,9 @@ fun WordListScreen(
         }
         Button(
             onClick = {
+                Log.d("WordListScreen", "Button 'Начать' clicked, catId = $catId")
                 navController.navigate(Screen.Learning.createRoute(catId))
+                Log.d("WordListScreen", "navController.navigate() called, route = ${Screen.Learning.createRoute(catId)}")
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -79,6 +85,7 @@ fun WordListScreen(
             )
         }
     }
+    Log.d("WordListScreen", "WordListScreen() finished, catId = $catId")
 }
 
 @Composable

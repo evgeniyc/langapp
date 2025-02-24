@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 fun LearningControls(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
-    onCategoryClick: () -> Unit
 ) {
     Spacer(modifier = Modifier.height(32.dp))
     Row(
@@ -24,9 +23,6 @@ fun LearningControls(
     ) {
         Button(onClick = onPreviousClick) {
             Text(text = "Назад")
-        }
-        Button(onClick = onCategoryClick) {
-            Text(text = "Категории")
         }
         Button(onClick = onNextClick) {
             Text(text = "Вперед")

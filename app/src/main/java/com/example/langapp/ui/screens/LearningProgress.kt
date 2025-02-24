@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun LearningProgress(
-    currentWordIndex: Int,
+    learnedWordsCount: Int,
     wordsSize: Int,
 ) {
     Row(
@@ -28,13 +28,13 @@ fun LearningProgress(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Слово ${currentWordIndex + 1} из $wordsSize",
+            text = "Изучено $learnedWordsCount из $wordsSize",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
         )
         LinearProgressIndicator(
-            progress = (currentWordIndex + 1).toFloat() / wordsSize,
+            progress = { if (wordsSize > 0) learnedWordsCount.toFloat() / wordsSize else 0f },
             modifier = Modifier
                 .width(100.dp)
                 .height(8.dp)

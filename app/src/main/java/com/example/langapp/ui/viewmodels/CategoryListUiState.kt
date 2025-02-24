@@ -1,4 +1,4 @@
-package com.example.langapp.ui
+package com.example.langapp.ui.viewmodels
 
 import com.example.langapp.data.entities.Category
 

@@ -3,7 +3,6 @@ package com.example.langapp.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.langapp.data.entities.Word
-import com.example.langapp.data.repositories.CategoryRepository
 import com.example.langapp.data.repositories.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,23 +10,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class WordListUiState(
-    val wordList: List<Word> = emptyList()
-)
-
-class WordListViewModel(
-    private val wordRepository: WordRepository,
-    private val categoryRepository: CategoryRepository
-) : ViewModel() {
+class WordListViewModel(private val wordRepository: WordRepository) : ViewModel() {
     private val _wordListUiState = MutableStateFlow(WordListUiState())
     val wordListUiState: StateFlow<WordListUiState> = _wordListUiState.asStateFlow()
 
-    fun getWordsByCategoryId(catId: Int) {
+    private fun updateLearnedWordsCount(wordList: List<Word>) {
+        val learnedCount = wordList.count { it.is_learned }
+        _wordListUiState.update {
+            it.copy(learnedWordsCount = learnedCount)
+        }
+    }
+
+    fun getWordsByCategoryId(categoryId: Int) {
         viewModelScope.launch {
-            wordRepository.getWordsByCategoryId(catId).collect { words ->
+            wordRepository.getWordsByCategoryId(categoryId).collect { wordList ->
                 _wordListUiState.update {
-                    it.copy(wordList = words)
+                    it.copy(wordList = wordList)
                 }
+                updateLearnedWordsCount(wordList)
             }
         }
     }

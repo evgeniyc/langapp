@@ -20,8 +20,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,62 +41,49 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.langapp.data.entities.Word
-import androidx.compose.animation.AnimatedContentScope
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LearningCard(
     currentWord: Word,
     isFlipped: Boolean,
     onCardClick: () -> Unit,
-    key: Int
+    onIsLearnedChange: (Word) -> Unit,
+    onIsImportantChange: (Word) -> Unit
 ) {
     val rotationYState = animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
         animationSpec = tween(durationMillis = 500), label = ""
     )
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp
-    AnimatedContent(
-        targetState = key,
-        transitionSpec = {
-            if (targetState > initialState) {
-                slideInHorizontally(
-                    initialOffsetX = { screenWidth },
-                    animationSpec = tween(durationMillis = 500)
-                ) + fadeIn(animationSpec = tween(durationMillis = 500)) with
-                        slideOutHorizontally(
-                            targetOffsetX = { -screenWidth },
-                            animationSpec = tween(durationMillis = 500)
-                        ) + fadeOut(animationSpec = tween(durationMillis = 500))
-            } else {
-                slideInHorizontally(
-                    initialOffsetX = { -screenWidth },
-                    animationSpec = tween(durationMillis = 500)
-                ) + fadeIn(animationSpec = tween(durationMillis = 500)) with
-                        slideOutHorizontally(
-                            targetOffsetX = { screenWidth },
-                            animationSpec = tween(durationMillis = 500)
-                        ) + fadeOut(animationSpec = tween(durationMillis = 500))
-            }.using(SizeTransform(clip = false))
-        }
-    ) {
-        Box(modifier = Modifier
-            .graphicsLayer {
-                rotationY = rotationYState.value
-                cameraDistance = 12f * density
-            }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clickable {
-                        onCardClick()
-                    },
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            ) {
+    Box(modifier = Modifier
+        .graphicsLayer {
+            rotationY = rotationYState.value
+            cameraDistance = 12f * density
+        }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clickable {
+                    onCardClick()
+                },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                IconButton(
+                    onClick = { onIsLearnedChange(currentWord) },
+                    modifier = Modifier.align(Alignment.TopStart)
+                ) {
+                    Icon(Icons.Filled.Check, contentDescription = "Mark as learned")
+                }
+                IconButton(
+                    onClick = { onIsImportantChange(currentWord) },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Icon(Icons.Filled.Star, contentDescription = "Mark as important")
+                }
                 AnimatedContent(
                     targetState = isFlipped,
                     transitionSpec = {

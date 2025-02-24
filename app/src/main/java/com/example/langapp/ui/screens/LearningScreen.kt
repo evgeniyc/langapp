@@ -23,41 +23,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.langapp.ui.viewmodels.LearningViewModel
 import com.example.langapp.ui.viewmodels.WordListViewModel
 
 @Composable
 fun LearningScreen(
     wordListViewModel: WordListViewModel,
-    categoryId: Int,
+    learningViewModel: LearningViewModel,
+    catId: Int,
     navController: NavController
 ) {
+    Log.d("LearningScreen", "LearningScreen() started, catId = $catId")
     val words by wordListViewModel.wordListUiState.collectAsState()
 
-    LaunchedEffect(key1 = categoryId) {
-        wordListViewModel.getWordsByCategoryId(categoryId)
+    LaunchedEffect(key1 = catId) {
+        Log.d("LearningScreen", "LaunchedEffect started, catId = $catId")
+        //wordListViewModel.getWordsByCategoryId(catId) // Мы убрали этот вызов!
+        Log.d("LearningScreen", "getWordsByCategoryId() not called, catId = $catId")
     }
 
     var currentWordIndex by remember { mutableIntStateOf(0) }
     var isFlipped by remember { mutableStateOf(false) }
 
     if (words.wordList.isEmpty()) {
+        Log.d("LearningScreen", "wordList is empty")
         Text(
             text = "В этой категории пока нет слов",
             modifier = Modifier.padding(top = 92.dp)
         )
+        Log.d("LearningScreen", "Text 'В этой категории пока нет слов' displayed")
         return
     }
 
-    Log.d(
-        "LearningScreen",
-        "Recomposition: currentWordIndex = $currentWordIndex, isFlipped = $isFlipped"
-    )
-
+    Log.d("LearningScreen", "wordList is not empty")
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 42.dp, start = 16.dp, end = 16.dp),
+                .padding(start = 16.dp, top = 42.dp, end = 16.dp, bottom = 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(48.dp))
@@ -68,42 +71,48 @@ fun LearningScreen(
                 color = Color.Black,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+            Log.d("LearningScreen", "Text 'Обучение' displayed")
             LearningProgress(
-                currentWordIndex = currentWordIndex,
+                learnedWordsCount = words.learnedWordsCount,
                 wordsSize = words.wordList.size,
             )
+            Log.d("LearningScreen", "LearningProgress called")
             Spacer(modifier = Modifier.height(16.dp))
             LearningCard(
                 currentWord = words.wordList[currentWordIndex],
                 isFlipped = isFlipped,
                 onCardClick = {
+                    Log.d("LearningScreen", "LearningCard clicked")
                     isFlipped = !isFlipped
-                    Log.d("LearningScreen", "Card clicked: isFlipped = $isFlipped")
                 },
-                key = currentWordIndex
-            )
-            LearningControls(
-                onPreviousClick = {
-                    currentWordIndex = (currentWordIndex - 1 + words.wordList.size) % words.wordList.size
-                    isFlipped = false
-                    Log.d(
-                        "LearningScreen",
-                        "Previous button clicked: currentWordIndex = $currentWordIndex, isFlipped = $isFlipped"
-                    )
+                onIsLearnedChange = {
+                    Log.d("LearningScreen", "onIsLearnedChange called")
+                    learningViewModel.updateWordIsLearned(it)
+                    Log.d("LearningScreen", "updateWordIsLearned() called")
                 },
-                onNextClick = {
-                    currentWordIndex = (currentWordIndex + 1) % words.wordList.size
-                    isFlipped = false
-                    Log.d(
-                        "LearningScreen",
-                        "Next button clicked: currentWordIndex = $currentWordIndex, isFlipped = $isFlipped"
-                    )
-                },
-                onCategoryClick = {
-                    navController.popBackStack(com.example.langapp.navigation.Screen.CategoryList.route, inclusive = false)
-                    navController.navigate(com.example.langapp.navigation.Screen.CategoryList.route)
+                onIsImportantChange = {
+                    Log.d("LearningScreen", "onIsImportantChange called")
+                    learningViewModel.updateWordIsImportant(it)
+                    Log.d("LearningScreen", "updateWordIsImportant() called")
                 }
             )
+            Log.d("LearningScreen", "LearningCard called")
+            LearningControls(
+                onPreviousClick = {
+                    Log.d("LearningScreen", "onPreviousClick called")
+                    currentWordIndex = (currentWordIndex - 1 + words.wordList.size) % words.wordList.size
+                    isFlipped = false
+                    Log.d("LearningScreen", "currentWordIndex = $currentWordIndex, isFlipped = $isFlipped")
+                },
+                onNextClick = {
+                    Log.d("LearningScreen", "onNextClick called")
+                    currentWordIndex = (currentWordIndex + 1) % words.wordList.size
+                    isFlipped = false
+                    Log.d("LearningScreen", "currentWordIndex = $currentWordIndex, isFlipped = $isFlipped")
+                }
+            )
+            Log.d("LearningScreen", "LearningControls called")
         }
     }
+    Log.d("LearningScreen", "LearningScreen() finished, catId = $catId")
 }

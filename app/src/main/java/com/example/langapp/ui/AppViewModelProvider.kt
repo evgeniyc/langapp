@@ -6,20 +6,25 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.langapp.LangApplication
 import com.example.langapp.ui.viewmodels.CategoryListViewModel
+import com.example.langapp.ui.viewmodels.LearningViewModel
 import com.example.langapp.ui.viewmodels.WordListViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            return@initializer CategoryListViewModel(
+            CategoryListViewModel(
                 langApplication().appContainer.categoryRepository
-            ) as CategoryListViewModel
+            )
         }
         initializer {
-            return@initializer WordListViewModel(
+            WordListViewModel(
                 langApplication().appContainer.wordRepository,
-                langApplication().appContainer.categoryRepository
-            ) as WordListViewModel
+            )
+        }
+        initializer {
+            LearningViewModel(
+                langApplication().appContainer.wordRepository,
+            )
         }
     }
 }
