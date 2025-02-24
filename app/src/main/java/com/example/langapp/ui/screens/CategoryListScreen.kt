@@ -22,11 +22,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.langapp.data.entities.Category
-import com.example.langapp.ui.CategoryListViewModel
+import com.example.langapp.navigation.Screen
+import com.example.langapp.ui.viewmodels.CategoryListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,37 +39,30 @@ fun CategoryListScreen(
 ) {
     val categoryListUiState by categoryListViewModel.categoryListUiState.collectAsState()
 
-    Log.d(
-        "CategoryListScreen",
-        "categoryListUiState: ${categoryListUiState.categoryList.size}"
-    ) // Добавлено логирование
-
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Список категорий") })
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Категории",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            )
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 items(
                     items = categoryListUiState.categoryList,
                     key = { category: Category -> category.id }
                 ) { category ->
-                    Log.d(
-                        "CategoryListScreen",
-                        "Category: ${category.name}"
-                    ) // Добавлено логирование
-                    CategoryItem(category = category, onItemClick = {
-                        navController.navigate("wordList/${category.id}")
-                    })
+                    CategoryItem(category = category, navController = navController)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -75,13 +71,13 @@ fun CategoryListScreen(
 }
 
 @Composable
-fun CategoryItem(category: Category, onItemClick: (Category) -> Unit) {
+fun CategoryItem(category: Category, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                onItemClick(category)
+                navController.navigate(Screen.WordList.createRoute(category.id))
             }
     ) {
         Row(

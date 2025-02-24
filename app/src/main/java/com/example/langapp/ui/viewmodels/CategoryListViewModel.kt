@@ -1,9 +1,10 @@
-package com.example.langapp.ui
+package com.example.langapp.ui.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.langapp.data.repositories.CategoryRepository
+import com.example.langapp.ui.CategoryListUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map

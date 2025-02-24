@@ -1,6 +1,7 @@
 package com.example.langapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,15 +27,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.langapp.data.entities.Word
-import com.example.langapp.ui.WordListViewModel
+import com.example.langapp.navigation.Screen
+import com.example.langapp.ui.viewmodels.WordListUiState
+import com.example.langapp.ui.viewmodels.WordListViewModel
 
 @Composable
 fun WordListScreen(
-    catId: Int, // Изменен параметр
-    wordListViewModel: WordListViewModel, // Изменен параметр
+    catId: Int,
+    wordListViewModel: WordListViewModel,
     navController: NavController
 ) {
-    val words by wordListViewModel.getWordsByCategoryId(catId).collectAsState(initial = emptyList()) // Получаем данные из WordListViewModel
+    val words by wordListViewModel.wordListUiState.collectAsState()
+
+    LaunchedEffect(key1 = catId) {
+        wordListViewModel.getWordsByCategoryId(catId)
+    }
 
     Column(
         modifier = Modifier
@@ -47,16 +55,15 @@ fun WordListScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 92.dp, bottom = 16.dp)
         )
-        // Список слов
         LazyColumn(modifier = Modifier.weight(1f)) {
-            items(words) { word -> // Отображаем реальные слова
-                WordItem(word = word) // Добавлен WordItem
+            items(words.wordList) { word ->
+                WordItem(word = word)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
         Button(
             onClick = {
-                navController.navigate("learning/$catId") // Исправлена навигация
+                navController.navigate(Screen.Learning.createRoute(catId))
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,16 +85,26 @@ fun WordListScreen(
 fun WordItem(word: Word) {
     Card(
         modifier = Modifier
-            .fillMaxWidth() // Исправлено: fillMaxSize -> fillMaxWidth
+            .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .padding(16.dp)
+                .fillMaxWidth()
         ) {
-            Text(text = word.name, style = MaterialTheme.typography.titleMedium)
-            Text(text = word.transl, style = MaterialTheme.typography.bodyMedium)
-            Text(text = word.transcr, style = MaterialTheme.typography.bodySmall)
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = word.name, style = MaterialTheme.typography.titleMedium)
+                Text(text = word.transcr, style = MaterialTheme.typography.bodySmall)
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(text = word.transl, style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }

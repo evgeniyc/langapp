@@ -5,18 +5,21 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.langapp.LangApplication
+import com.example.langapp.ui.viewmodels.CategoryListViewModel
+import com.example.langapp.ui.viewmodels.WordListViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            CategoryListViewModel(
+            return@initializer CategoryListViewModel(
                 langApplication().appContainer.categoryRepository
-            )
+            ) as CategoryListViewModel
         }
         initializer {
-            WordListViewModel(
-                langApplication().appContainer.wordRepository
-            )
+            return@initializer WordListViewModel(
+                langApplication().appContainer.wordRepository,
+                langApplication().appContainer.categoryRepository
+            ) as WordListViewModel
         }
     }
 }
