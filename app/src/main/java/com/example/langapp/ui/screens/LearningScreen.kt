@@ -80,7 +80,15 @@ fun LearningScreen(
                     isFlipped = !isFlipped
                     Log.d("LearningScreen", "Card clicked: isFlipped = $isFlipped")
                 },
-                key = currentWordIndex
+                key = currentWordIndex,
+                onImportantClick = {
+                    wordListViewModel.updateWordIsImportant(words.wordList[currentWordIndex]) // Вызываем функцию
+                    Log.d("LearningScreen", "Important clicked")
+                },
+                onLearnedClick = {
+                    wordListViewModel.updateWordIsLearned(words.wordList[currentWordIndex]) // Вызываем функцию
+                    Log.d("LearningScreen", "Learned clicked")
+                }
             )
             LearningControls(
                 onPreviousClick = {

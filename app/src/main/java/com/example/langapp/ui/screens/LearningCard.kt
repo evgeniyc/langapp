@@ -13,15 +13,19 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.with
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.langapp.data.entities.Word
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.with
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -42,7 +46,9 @@ fun LearningCard(
     currentWord: Word,
     isFlipped: Boolean,
     onCardClick: () -> Unit,
-    key: Int
+    key: Int,
+    onImportantClick: () -> Unit,
+    onLearnedClick: () -> Unit
 ) {
     val rotationYState = animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
@@ -97,7 +103,12 @@ fun LearningCard(
                                 fadeOut(animationSpec = tween(durationMillis = 500))
                     }
                 ) {
-                    CardContent(currentWord = currentWord, isFlipped = isFlipped)
+                    CardContent(
+                        currentWord = currentWord,
+                        isFlipped = isFlipped,
+                        onImportantClick = onImportantClick,
+                        onLearnedClick = onLearnedClick
+                    )
                 }
             }
         }
@@ -105,7 +116,12 @@ fun LearningCard(
 }
 
 @Composable
-fun CardContent(currentWord: Word, isFlipped: Boolean) {
+fun CardContent(
+    currentWord: Word,
+    isFlipped: Boolean,
+    onImportantClick: () -> Unit,
+    onLearnedClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -117,6 +133,26 @@ fun CardContent(currentWord: Word, isFlipped: Boolean) {
             ),
         contentAlignment = Alignment.Center
     ) {
+        IconButton(
+            onClick = onLearnedClick,
+            modifier = Modifier.align(Alignment.TopStart)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = "Learned",
+                tint = if (currentWord.is_learned) Color.Green else Color.LightGray
+            )
+        }
+        IconButton(
+            onClick = onImportantClick,
+            modifier = Modifier.align(Alignment.TopEnd)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "Important",
+                tint = if (currentWord.is_important) Color.Yellow else Color.LightGray
+            )
+        }
         AnimatedVisibility(
             visible = !isFlipped,
             enter = fadeIn(animationSpec = tween(durationMillis = 500)),

@@ -31,4 +31,16 @@ class WordListViewModel(
             }
         }
     }
+
+    fun updateWordIsImportant(word: Word) {
+        viewModelScope.launch {
+            wordRepository.updateWord(word.copy(is_important = !word.is_important))
+        }
+    }
+
+    fun updateWordIsLearned(word: Word) {
+        viewModelScope.launch {
+            wordRepository.updateWord(word.copy(is_learned = !word.is_learned))
+        }
+    }
 }
