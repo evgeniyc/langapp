@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +40,7 @@ import com.example.langapp.data.entities.Word
 import com.example.langapp.navigation.Screen
 import com.example.langapp.ui.viewmodels.WordListViewModel
 
+
 @Composable
 fun WordListScreen(
     catId: Int,
@@ -42,6 +48,8 @@ fun WordListScreen(
     navController: NavController
 ) {
     val words by wordListViewModel.wordListUiState.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Рабочий список") }
 
     LaunchedEffect(key1 = catId) {
         wordListViewModel.getWordsByCategoryId(catId)
@@ -66,12 +74,45 @@ fun WordListScreen(
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = {
-                Log.d("WordListScreen", "Settings icon clicked")
+                expanded = true
             }) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
                     contentDescription = "Настройки"
                 )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Рабочий список") },
+                        onClick = {
+                            selectedOption = "Рабочий список"
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Только Важные") },
+                        onClick = {
+                            selectedOption = "Только Важные"
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Только Изученные") },
+                        onClick = {
+                            selectedOption = "Только Изученные"
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Все вместе") },
+                        onClick = {
+                            selectedOption = "Все вместе"
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
         LazyColumn(modifier = Modifier.weight(1f)) {
