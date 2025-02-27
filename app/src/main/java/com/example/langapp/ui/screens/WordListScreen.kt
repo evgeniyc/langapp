@@ -54,6 +54,7 @@ fun WordListScreen(
     LaunchedEffect(key1 = catId) {
         wordListViewModel.getWordsByCategoryId(catId)
     }
+    val filteredWords = filterWords(words.wordList, selectedOption)
 
     Column(
         modifier = Modifier
@@ -116,7 +117,7 @@ fun WordListScreen(
             }
         }
         LazyColumn(modifier = Modifier.weight(1f)) {
-            items(words.wordList) { word ->
+            items(filteredWords) { word ->
                 WordItem(word = word)
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -166,5 +167,15 @@ fun WordItem(word: Word) {
                 Text(text = word.transl, style = MaterialTheme.typography.bodyMedium)
             }
         }
+    }
+}
+
+fun filterWords(words: List<Word>, selectedOption: String): List<Word> {
+    return when (selectedOption) {
+        "Рабочий список" -> words.filter { !it.is_learned } // Фильтруем слова, которые не изучены
+        "Только Важные" -> words.filter { it.is_important } // Фильтруем слова, которые важны
+        "Только Изученные" -> words.filter { it.is_learned } // Фильтруем слова, которые изучены
+        "Все вместе" -> words // Возвращаем все слова
+        else -> words // По умолчанию возвращаем все слова
     }
 }
