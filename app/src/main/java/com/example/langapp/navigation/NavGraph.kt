@@ -1,6 +1,7 @@
 package com.example.langapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -10,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.langapp.ui.AppViewModelProvider
 import com.example.langapp.ui.viewmodels.CategoryListViewModel
+import com.example.langapp.ui.viewmodels.WordFilter
 import com.example.langapp.ui.viewmodels.WordListViewModel
 import com.example.langapp.ui.screens.CategoryListScreen
 import com.example.langapp.ui.screens.LearningScreen
@@ -45,10 +47,17 @@ fun NavGraph(
         }
         composable(
             route = Screen.Learning.route,
-            arguments = listOf(navArgument("catId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("catId") { type = NavType.IntType },
+                navArgument("filter") { type = NavType.EnumType(WordFilter::class.java) }
+            )
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getInt("catId") ?: 0
+            val filter = backStackEntry.arguments?.get("filter") as? WordFilter ?: WordFilter.ALL
             val wordListViewModel: WordListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+            LaunchedEffect(key1 = filter) {
+                wordListViewModel.updateFilter(filter)
+            }
             LearningScreen(
                 wordListViewModel = wordListViewModel,
                 categoryId = categoryId,
@@ -63,7 +72,7 @@ sealed class Screen(val route: String) {
     object WordList : Screen("word_list/{catId}") {
         fun createRoute(catId: Int) = "word_list/$catId"
     }
-    object Learning : Screen("learning/{catId}") {
-        fun createRoute(catId: Int) = "learning/$catId"
+    object Learning : Screen("learning/{catId}/{filter}") {
+        fun createRoute(catId: Int, filter: WordFilter) = "learning/$catId/$filter"
     }
 }

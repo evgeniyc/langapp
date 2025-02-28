@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.langapp.data.entities.Word
 import com.example.langapp.ui.viewmodels.WordListViewModel
 
 @Composable
@@ -53,6 +54,11 @@ fun LearningScreen(
         "Recomposition: currentWordIndex = $currentWordIndex, isFlipped = $isFlipped"
     )
 
+    // Функция для обновления слова в БД
+    fun updateWord(word: Word) {
+        wordListViewModel.updateWord(word)
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -80,7 +86,10 @@ fun LearningScreen(
                     isFlipped = !isFlipped
                     Log.d("LearningScreen", "Card clicked: isFlipped = $isFlipped")
                 },
-                key = currentWordIndex
+                key = currentWordIndex,
+                onUpdateWord = { updatedWord ->
+                    updateWord(updatedWord)
+                }
             )
             LearningControls(
                 onPreviousClick = {

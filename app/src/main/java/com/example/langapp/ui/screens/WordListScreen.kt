@@ -1,6 +1,5 @@
 package com.example.langapp.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.langapp.data.entities.Word
 import com.example.langapp.navigation.Screen
+import com.example.langapp.ui.viewmodels.WordFilter
 import com.example.langapp.ui.viewmodels.WordListViewModel
-
 
 @Composable
 fun WordListScreen(
@@ -48,13 +47,12 @@ fun WordListScreen(
     navController: NavController
 ) {
     val words by wordListViewModel.wordListUiState.collectAsState()
+    val currentFilter = words.currentFilter
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Рабочий список") }
 
     LaunchedEffect(key1 = catId) {
         wordListViewModel.getWordsByCategoryId(catId)
     }
-    val filteredWords = filterWords(words.wordList, selectedOption)
 
     Column(
         modifier = Modifier
@@ -88,28 +86,28 @@ fun WordListScreen(
                     DropdownMenuItem(
                         text = { Text("Рабочий список") },
                         onClick = {
-                            selectedOption = "Рабочий список"
+                            wordListViewModel.updateFilter(WordFilter.NOT_LEARNED)
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Только Важные") },
                         onClick = {
-                            selectedOption = "Только Важные"
+                            wordListViewModel.updateFilter(WordFilter.IMPORTANT)
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Только Изученные") },
                         onClick = {
-                            selectedOption = "Только Изученные"
+                            wordListViewModel.updateFilter(WordFilter.LEARNED)
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Все вместе") },
                         onClick = {
-                            selectedOption = "Все вместе"
+                            wordListViewModel.updateFilter(WordFilter.ALL)
                             expanded = false
                         }
                     )
@@ -117,14 +115,14 @@ fun WordListScreen(
             }
         }
         LazyColumn(modifier = Modifier.weight(1f)) {
-            items(filteredWords) { word ->
+            items(words.wordList) { word ->
                 WordItem(word = word)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
         Button(
             onClick = {
-                navController.navigate(Screen.Learning.createRoute(catId))
+                navController.navigate(Screen.Learning.createRoute(catId, currentFilter))
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -167,15 +165,5 @@ fun WordItem(word: Word) {
                 Text(text = word.transl, style = MaterialTheme.typography.bodyMedium)
             }
         }
-    }
-}
-
-fun filterWords(words: List<Word>, selectedOption: String): List<Word> {
-    return when (selectedOption) {
-        "Рабочий список" -> words.filter { !it.is_learned } // Фильтруем слова, которые не изучены
-        "Только Важные" -> words.filter { it.is_important } // Фильтруем слова, которые важны
-        "Только Изученные" -> words.filter { it.is_learned } // Фильтруем слова, которые изучены
-        "Все вместе" -> words // Возвращаем все слова
-        else -> words // По умолчанию возвращаем все слова
     }
 }

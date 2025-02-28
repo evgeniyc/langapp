@@ -53,7 +53,8 @@ fun LearningCard(
     currentWord: Word,
     isFlipped: Boolean,
     onCardClick: () -> Unit,
-    key: Int
+    key: Int,
+    onUpdateWord: (Word) -> Unit
 ) {
     val rotationYState = animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
@@ -107,7 +108,10 @@ fun LearningCard(
                     var is_learned by remember { mutableStateOf(currentWord.is_learned) }
                     // Звездочка
                     IconButton(
-                        onClick = { is_important = !is_important },
+                        onClick = {
+                            is_important = !is_important
+                            onUpdateWord(currentWord.copy(is_important = is_important))
+                        },
                         modifier = Modifier
                             .padding(16.dp)
                             .align(Alignment.TopEnd)
@@ -120,7 +124,10 @@ fun LearningCard(
                     }
                     // Птичка
                     IconButton(
-                        onClick = { is_learned = !is_learned },
+                        onClick = {
+                            is_learned = !is_learned
+                            onUpdateWord(currentWord.copy(is_learned = is_learned))
+                        },
                         modifier = Modifier
                             .padding(16.dp)
                             .align(Alignment.TopStart)
