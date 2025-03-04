@@ -18,6 +18,22 @@ object Words {
         Word(catId = 1, name = "Grüß dich", transl = "Здравствуй", transcr = "[ɡʁyːs dɪç]", is_important = false, is_learned = false),
         Word(catId = 1, name = "Willkommen", transl = "Добро пожаловать", transcr = "[vɪlˈkɔmən]", is_important = false, is_learned = false),
         Word(catId = 1, name = "Leb wohl", transl = "Прощай", transcr = "[leːp voːl]", is_important = false, is_learned = false),
-        Word(catId = 1, name = "Mach's gut", transl = "Всего хорошего", transcr = "[maxs ɡuːt]", is_important = false, is_learned = false)
+        Word(catId = 1, name = "Mach's gut", transl = "Всего хорошего", transcr = "[maxs ɡuːt]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "eins", transl = "один", transcr = "[aɪ̯ns]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "zwei", transl = "два", transcr = "[t͡svaɪ̯]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "drei", transl = "три", transcr = "[dʁaɪ̯]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "vier", transl = "четыре", transcr = "[fiːɐ̯]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "fünf", transl = "пять", transcr = "[fʏnf]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "sechs", transl = "шесть", transcr = "[zɛks]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "sieben", transl = "семь", transcr = "[ˈziːbn̩]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "acht", transl = "восемь", transcr = "[axt]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "neun", transl = "девять", transcr = "[nɔɪ̯n]", is_important = false, is_learned = false),
+        Word(catId = 6, name = "zehn", transl = "десять", transcr = "[t͡seːn]", is_important = false, is_learned = false),
+        Word(catId = 7, name = "die Stunde", transl = "час", transcr = "[ˈʃtʊndə]", is_important = false, is_learned = false),
+        Word(catId = 7, name = "die Minute", transl = "минута", transcr = "[miˈnuːtə]", is_important = false, is_learned = false),
+        Word(catId = 7, name = "die Sekunde", transl = "секунда", transcr = "[zeˈkʊndə]", is_important = false, is_learned = false),
+        Word(catId = 7, name = "die Uhr", transl = "часы", transcr = "[uːɐ̯]", is_important = false, is_learned = false),
+        Word(catId = 7, name = "die Uhrzeit", transl = "время (на часах)", transcr = "[ˈuːɐ̯ˌtsaɪ̯t]", is_important = false, is_learned = false),
+        Word(catId = 7, name = "die Zeit", transl = "время", transcr = "[tsaɪ̯t]", is_important = false, is_learned = false)
     )
 }

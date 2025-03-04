@@ -7,21 +7,27 @@ import androidx.room.RoomDatabase
 import com.example.langapp.data.entities.Category
 import com.example.langapp.data.entities.Word
 
-@Database(entities = [Category::class, Word::class], version = 1, exportSchema = false)
+@Database(entities = [Category::class, Word::class], version = 2, exportSchema = false)
 abstract class LangDatabase : RoomDatabase() {
+
     abstract fun categoryDao(): CategoryDao
     abstract fun wordDao(): WordDao
 
     companion object {
         @Volatile
-        private var Instance: LangDatabase? = null
+        private var INSTANCE: LangDatabase? = null
 
         fun getDatabase(context: Context): LangDatabase {
-            return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, LangDatabase::class.java, "lang_database")
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    LangDatabase::class.java,
+                    "lang_database"
+                )
                     .fallbackToDestructiveMigration()
                     .build()
-                    .also { Instance = it }
+                INSTANCE = instance
+                instance
             }
         }
     }
