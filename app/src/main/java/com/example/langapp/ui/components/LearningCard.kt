@@ -1,5 +1,6 @@
-package com.example.langapp.ui.screens
+package com.example.langapp.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -14,6 +15,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.with
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
@@ -47,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.langapp.data.entities.Word
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun LearningCard(
@@ -54,7 +58,8 @@ fun LearningCard(
     isFlipped: Boolean,
     onCardClick: () -> Unit,
     key: Int,
-    onUpdateWord: (Word) -> Unit
+    onUpdateWord: (Word) -> Unit,
+    modifier: Modifier
 ) {
     val rotationYState = animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
@@ -86,18 +91,22 @@ fun LearningCard(
             }.using(SizeTransform(clip = false))
         }
     ) {
-        Box(modifier = Modifier
+        Box(modifier = modifier
             .graphicsLayer {
                 rotationY = rotationYState.value
                 cameraDistance = 12f * density
-            }) {
+            })
+        {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
+                    .border(1.dp, Color.Gray, RoundedCornerShape(6.dp))
                     .clickable {
                         onCardClick()
                     },
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), // Используем elevation
+                shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
@@ -144,7 +153,7 @@ fun LearningCard(
                             fadeIn(animationSpec = tween(durationMillis = 500)) togetherWith
                                     fadeOut(animationSpec = tween(durationMillis = 500))
                         }
-                    ) {
+                    ) {isFlipped->
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()

@@ -6,7 +6,7 @@ enum class WordFilter {
     ALL, IMPORTANT, LEARNED, NOT_LEARNED
 }
 
-data class WordListUiState(
+data class WordUiState(
     val wordList: List<Word> = emptyList(),
     val currentFilter: WordFilter = WordFilter.NOT_LEARNED
 )

@@ -24,12 +24,12 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
     }
 
     fun getAllCategories(): Flow<List<Category>> = flow {
-        delay(1000) // Задержка перед получением данных
+       //delay(1000) // Задержка перед получением данных
         emitAll(categoryDao.getAllCategories())
     }.flowOn(Dispatchers.IO)
 
     fun getCategoryById(id: Int): Flow<Category> = flow {
-        delay(1000) // Задержка перед получением данных
+        //delay(1000) // Задержка перед получением данных
         emitAll(categoryDao.getCategoryById(id))
     }.flowOn(Dispatchers.IO)
 
