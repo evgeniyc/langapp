@@ -8,5 +8,6 @@ enum class WordFilter {
 
 data class WordUiState(
     val wordList: List<Word> = emptyList(),
-    val currentFilter: WordFilter = WordFilter.NOT_LEARNED
+    val currentFilter: WordFilter = WordFilter.NOT_LEARNED,
+    val isLoading: Boolean = true // Добавлено состояние загрузки
 )

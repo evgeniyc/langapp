@@ -1,8 +1,9 @@
-package com.example.langapp.data.database
+package com.example.langapp.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.langapp.data.entities.Category
@@ -14,9 +15,9 @@ interface CategoryDao {
     fun getAllCategories(): Flow<List<Category>>
 
     @Query("SELECT * FROM categories WHERE id = :id")
-    fun getCategoryById(id: Int): Flow<Category>
+    fun getCategoryById(id: Int): Flow<Category?>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(category: Category)
 
     @Update

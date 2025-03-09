@@ -1,9 +1,8 @@
 package com.example.langapp.data.repositories
 
-import com.example.langapp.data.database.CategoryDao
+import com.example.langapp.data.dao.CategoryDao
 import com.example.langapp.data.entities.Category
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -24,12 +23,10 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
     }
 
     fun getAllCategories(): Flow<List<Category>> = flow {
-       //delay(1000) // Задержка перед получением данных
-        emitAll(categoryDao.getAllCategories())
+       emitAll(categoryDao.getAllCategories())
     }.flowOn(Dispatchers.IO)
 
-    fun getCategoryById(id: Int): Flow<Category> = flow {
-        //delay(1000) // Задержка перед получением данных
+    fun getCategoryById(id: Int): Flow<Category?> = flow {
         emitAll(categoryDao.getCategoryById(id))
     }.flowOn(Dispatchers.IO)
 

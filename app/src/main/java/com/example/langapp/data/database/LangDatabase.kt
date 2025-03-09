@@ -6,8 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.langapp.data.entities.Category
 import com.example.langapp.data.entities.Word
+import com.example.langapp.data.dao.CategoryDao
+import com.example.langapp.data.dao.WordDao
 
-@Database(entities = [Category::class, Word::class], version = 2, exportSchema = false)
+@Database(entities = [Category::class, Word::class], version = 3, exportSchema = false)
 abstract class LangDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
