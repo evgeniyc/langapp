@@ -8,14 +8,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.langapp.ui.components.CategoryCard
-import com.example.langapp.ui.components.Screen
+import com.example.langapp.ui.components.CommonScreen
 import com.example.langapp.ui.components.TopBar
 import com.example.langapp.ui.viewmodels.CategoryViewModel
 import com.example.langapp.ui.viewmodels.WordViewModel
@@ -30,7 +34,7 @@ fun CategoryScreen(
     val categories by categoryViewModel.categoryUiState.collectAsState()
     Log.d("CategoryScreen", "CategoryScreen: categories = $categories")
 
-    Screen(
+    CommonScreen(
         topBar = {
             Log.d("CategoryScreen", "Screen: topBar: start")
             TopBar(title = "Категории")
@@ -46,8 +50,10 @@ fun CategoryScreen(
                 Log.d("CategoryScreen", "LazyColumn: start")
                 items(categories.categoryList) { category ->
                     Log.d("CategoryScreen", "items: start, category = $category")
-                    val progress by wordViewModel.getProgressForCategory(category.id)
-                        .collectAsState(initial = 0f)
+                    var progress by remember { mutableStateOf(0f) }
+                    LaunchedEffect(key1 = true) {
+                        progress = wordViewModel.getProgressForCategory(category.id)
+                    }
                     Log.d("CategoryScreen", "items: progress = $progress")
                     CategoryCard(
                         category = category,

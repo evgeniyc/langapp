@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,7 +29,7 @@ import androidx.navigation.NavController
 import com.example.langapp.data.entities.Word
 import com.example.langapp.navigation.Screen
 import com.example.langapp.ui.components.WordCard
-import com.example.langapp.ui.components.Screen
+import com.example.langapp.ui.components.CommonScreen
 import com.example.langapp.ui.components.WordListTopBar
 import com.example.langapp.ui.viewmodels.WordViewModel
 import androidx.compose.foundation.lazy.items
@@ -46,7 +47,7 @@ fun WordScreen(
     var expanded by remember { mutableStateOf(false) }
     var componentSize by remember { mutableStateOf(IntSize.Zero) }
 
-    Screen(
+    CommonScreen(
         topBar = {
             WordListTopBar(
                 title = "Список слов",
@@ -69,6 +70,7 @@ fun WordScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .navigationBarsPadding()
             ) {
                 items(words.wordList) { word ->
                     WordCard(word = word)
@@ -84,7 +86,7 @@ fun WordScreen(
                 onRightClick = {
                     navController.navigate(Screen.Learning.createRoute(catId, currentFilter))
                 },
-                modifier = Modifier.padding(horizontal = 16.dp),
+                //modifier = Modifier.padding(horizontal = 16.dp),
                 leftText = "Категории",
                 rightText = "Начать"
             )

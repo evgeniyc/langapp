@@ -33,7 +33,7 @@ import com.example.langapp.navigation.Screen
 import com.example.langapp.ui.components.LearningCard
 import com.example.langapp.ui.components.LearningProgress
 import com.example.langapp.ui.components.TopBar
-import com.example.langapp.ui.components.Screen
+import com.example.langapp.ui.components.CommonScreen
 import com.example.langapp.ui.WordFilter
 import com.example.langapp.ui.components.NavBar
 import com.example.langapp.ui.viewmodels.WordViewModel
@@ -60,7 +60,7 @@ fun LearningScreen(
         wordViewModel.updateWord(word)
     }
 
-    Screen(
+    CommonScreen(
         topBar = { TopBar(title = "Обучение") },
         content = { innerPadding ->
             if (words.isLoading) {
@@ -124,8 +124,7 @@ fun LearningScreen(
                     navController.navigate(Screen.CategoryList.route)
 
                 },
-                modifier = Modifier.padding(horizontal = 16.dp),
-                leftText = "Назад",
+               leftText = "Назад",
                 rightText = "Категории"
             )
         }

@@ -2,6 +2,7 @@ package com.example.langapp.ui.components
 
 import android.app.Activity
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
@@ -15,7 +16,7 @@ import androidx.core.view.WindowCompat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Screen(
+fun CommonScreen(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = { TopAppBar(title = { Text("") }) },
     bottomBar: @Composable () -> Unit = {},
@@ -31,7 +32,7 @@ fun Screen(
         }
     }
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = topBar,
         bottomBar = bottomBar,
         content = content

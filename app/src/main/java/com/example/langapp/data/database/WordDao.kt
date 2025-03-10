@@ -31,4 +31,10 @@ interface WordDao {
 
     @Query("SELECT COUNT(*) FROM words WHERE catId = :categoryId AND is_learned = 1")
     fun getLearnedWordsCountByCategoryId(categoryId: Int): Flow<Int>
+
+    @Query(
+        "SELECT CAST(SUM(CASE WHEN is_learned THEN 1 ELSE 0 END) AS REAL) / " +
+                "COUNT(*) FROM words WHERE catId = :categoryId"
+    )
+    suspend fun getProgressForCategory(categoryId: Int): Float
 }

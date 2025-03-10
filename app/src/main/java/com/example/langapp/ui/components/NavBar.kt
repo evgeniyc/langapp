@@ -27,21 +27,37 @@ fun NavBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(vertical = 4.dp),
+            .height(56.dp)
+            .padding(horizontal = 8.dp),
+        //.wrapContentHeight()
+        //.padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        //verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onLeftClick) {
+        Button(
+            onClick = onLeftClick,
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 6.dp, // Тень в обычном состоянии
+                pressedElevation = 12.dp, // Тень при нажатии
+                disabledElevation = 0.dp // Тень в отключенном состоянии
+            )
+        ) {
             Text(
                 text = leftText,
-                color = MaterialTheme.colorScheme.onPrimary
+                //color = MaterialTheme.colorScheme.onPrimary
             )
         }
-        Button(onClick = onRightClick) {
+        Button(
+            onClick = onRightClick,
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 6.dp, // Тень в обычном состоянии
+                pressedElevation = 12.dp, // Тень при нажатии
+                disabledElevation = 0.dp // Тень в отключенном состоянии
+            )
+        ) {
             Text(
                 text = rightText,
-                color = MaterialTheme.colorScheme.onPrimary
+                //color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

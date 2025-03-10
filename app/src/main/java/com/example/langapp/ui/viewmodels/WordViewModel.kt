@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -99,27 +100,6 @@ class WordViewModel @Inject constructor(
         return result
     }
 
-    fun getProgressForCategory(categoryId: Int): StateFlow<Float> {
-        Log.d(TAG, "getProgressForCategory: start, categoryId = $categoryId")
-        val totalWordsFlow = wordRepository.getWordsByCategoryId(categoryId)
-        val learnedWordsFlow = wordRepository.getLearnedWordsCountByCategoryId(categoryId)
-
-        val result = totalWordsFlow.combine(learnedWordsFlow) { totalWords, learnedWords ->
-            Log.d(TAG, "getProgressForCategory: combine, totalWords = $totalWords, learnedWords = $learnedWords")
-            if (totalWords.isNotEmpty()) {
-                learnedWords.toFloat() / totalWords.size.toFloat()
-            } else {
-                Log.e(TAG, "getProgressForCategory: totalWords is empty")
-                0f
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 0f
-        )
-        Log.d(TAG, "getProgressForCategory: end")
-        return result
-    }
     fun hasWordsInCategory(categoryId: Int): Flow<Boolean> {
         Log.d(TAG, "hasWordsInCategory: start, categoryId = $categoryId")
         val result = wordRepository.getWordsByCategoryId(categoryId).map { words ->
@@ -128,5 +108,12 @@ class WordViewModel @Inject constructor(
         }
         Log.d(TAG, "hasWordsInCategory: end")
         return result
+    }
+    suspend fun getProgressForCategory(categoryId: Int): Float {
+        Log.d(TAG, "getProgressForCategory: start, categoryId = $categoryId")
+        return withContext(viewModelScope.coroutineContext) {
+            wordRepository.getProgressForCategory(categoryId)
+        }
+        Log.d(TAG, "getProgressForCategory: end")
     }
 }

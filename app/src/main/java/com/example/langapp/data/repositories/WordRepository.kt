@@ -13,6 +13,7 @@ class WordRepository @Inject constructor(private val wordDao: WordDao) {
     companion object {
         private const val TAG = "WordRepository"
     }
+
     fun getAllWords(): Flow<List<Word>> {
         Log.d(TAG, "getAllWords: start")
         val result = wordDao.getAllWords().flowOn(Dispatchers.IO)
@@ -63,5 +64,9 @@ class WordRepository @Inject constructor(private val wordDao: WordDao) {
             wordDao.deleteWord(word)
         }
         Log.d(TAG, "deleteWord: end")
+    }
+
+    suspend fun getProgressForCategory(categoryId: Int): Float {
+        return wordDao.getProgressForCategory(categoryId)
     }
 }
