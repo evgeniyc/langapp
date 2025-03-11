@@ -10,12 +10,14 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -29,7 +31,8 @@ fun WordListTopBar(
     modifier: Modifier = Modifier,
     onFilterChange: (WordFilter) -> Unit = {},
     expanded: Boolean,
-    componentSize: IntSize
+    componentSize: IntSize,
+    textStyle: TextStyle = MaterialTheme.typography.headlineLarge
 ) {
     TopAppBar(
         title = {
@@ -37,7 +40,7 @@ fun WordListTopBar(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = title)
+                Text(text = title, style = textStyle)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = onSettingsClick) {
                     Icon(Icons.Filled.Settings, contentDescription = "Settings")

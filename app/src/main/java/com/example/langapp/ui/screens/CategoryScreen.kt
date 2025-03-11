@@ -36,12 +36,9 @@ fun CategoryScreen(
 
     CommonScreen(
         topBar = {
-            Log.d("CategoryScreen", "Screen: topBar: start")
             TopBar(title = "Категории")
-            Log.d("CategoryScreen", "Screen: topBar: end")
         },
         content = { innerPadding ->
-            Log.d("CategoryScreen", "Screen: content: start")
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

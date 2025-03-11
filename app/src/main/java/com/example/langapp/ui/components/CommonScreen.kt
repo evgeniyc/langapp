@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
@@ -18,7 +19,7 @@ import androidx.core.view.WindowCompat
 @Composable
 fun CommonScreen(
     modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit = { TopAppBar(title = { Text("") }) },
+    topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
