@@ -9,14 +9,14 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "words",
     foreignKeys = [ForeignKey(
-        entity = Category::class,
+        entity = CategoryEntity::class,
         parentColumns = ["id"],
         childColumns = ["catId"],
         onDelete = ForeignKey.CASCADE
     )],
-            indices = [Index(value = ["catId"])]
+    indices = [Index(value = ["catId"])]
 )
-data class Word(
+data class WordEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "transl") val transl: String,

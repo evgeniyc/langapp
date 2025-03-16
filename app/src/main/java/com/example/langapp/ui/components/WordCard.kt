@@ -15,15 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.langapp.data.entities.Word
+import com.example.langapp.data.entities.WordEntity
 
 @Composable
 fun WordCard(
     modifier: Modifier = Modifier,
-    word: Word,
+    word: WordEntity,
     ) {
     Card(
         modifier = modifier

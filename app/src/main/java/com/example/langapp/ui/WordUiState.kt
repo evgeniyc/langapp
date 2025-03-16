@@ -1,13 +1,12 @@
 package com.example.langapp.ui
 
-import com.example.langapp.data.entities.Word
-
-enum class WordFilter {
-    ALL, IMPORTANT, LEARNED, NOT_LEARNED
-}
+import com.example.langapp.data.Word // Правильный импорт
 
 data class WordUiState(
-    val wordList: List<Word> = emptyList(),
-    val currentFilter: WordFilter = WordFilter.NOT_LEARNED,
-    val isLoading: Boolean = true // Добавлено состояние загрузки
+    val isLoading: Boolean = false,
+    val mode: Int = WordFilter.NOT_LEARNED.ordinal, // Текущий режим фильтрации
+    val size: Int = 0, // Размер списка слов
+    val index: Int = 0, // Индекс текущего слова
+    val currentWord: Word? = null, // Текущее слово (изменено на Word)
+    val words: List<Word> = emptyList(), // Список слов (изменено на List<Word>)
 )

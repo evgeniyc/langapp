@@ -30,7 +30,7 @@ object AppViewModelProvider {
                 // 1. Передаем SavedStateHandle
                 val savedStateHandle = this.createSavedStateHandle()
                 // 2. Сохраняем catId в SavedStateHandle
-                savedStateHandle[WordViewModel.CATEGORY_ID] = catId
+                savedStateHandle.set(WordViewModel.CATEGORY_ID, catId)
                 val result = WordViewModel(application.appContainer.wordRepository, savedStateHandle)
                 Log.d(TAG, "WordViewModel: end")
                 result

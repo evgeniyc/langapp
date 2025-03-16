@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.langapp.data.entities.Category
-import com.example.langapp.data.entities.Word
-import com.example.langapp.data.dao.CategoryDao
-import com.example.langapp.data.dao.WordDao
+import com.example.langapp.data.entities.CategoryEntity
+import com.example.langapp.data.entities.WordEntity
+import com.example.langapp.database.CategoryDao
+import com.example.langapp.database.WordDao
 
-@Database(entities = [Category::class, Word::class], version = 3, exportSchema = false)
+@Database(entities = [CategoryEntity::class, WordEntity::class], version = 4, exportSchema = false)
 abstract class LangDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
@@ -26,7 +26,7 @@ abstract class LangDatabase : RoomDatabase() {
                     LangDatabase::class.java,
                     "lang_database"
                 )
-                    .fallbackToDestructiveMigration()
+                    //.fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance

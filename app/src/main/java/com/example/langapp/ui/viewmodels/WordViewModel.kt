@@ -1,25 +1,28 @@
 package com.example.langapp.ui.viewmodels
 
 import android.util.Log
+import androidx.compose.animation.core.copy
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.langapp.data.entities.Word
 import com.example.langapp.data.repositories.WordRepository
-import com.example.langapp.ui.WordUiState
+import com.example.langapp.data.entities.WordEntity
+import com.example.langapp.data.Word
 import com.example.langapp.ui.WordFilter
+import com.example.langapp.ui.WordUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,93 +30,140 @@ class WordViewModel @Inject constructor(
     private val wordRepository: WordRepository,
     val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    companion object {
-        private const val TAG = "WordViewModel"
-        const val CATEGORY_ID = "catId"
-    }
-
-    private val catId: Int = savedStateHandle[CATEGORY_ID] ?: 0
-
     private val _wordUiState = MutableStateFlow(WordUiState())
     val wordUiState: StateFlow<WordUiState> = _wordUiState.asStateFlow()
+    var mode: Int = savedStateHandle.get<Int>(FILTER) ?: WordFilter.NOT_LEARNED.ordinal
+    var catId: Int = savedStateHandle.get<Int>(CATEGORY_ID) ?: 0
+    private var allWords: List<Word> = emptyList()
+    private lateinit var allWordsFlow: Flow<List<Word>>
 
     init {
-        Log.d(TAG, "init: start, catId = $catId")
-        if (catId != 0) {
-            getWords(catId)
+        val restoredUiState = savedStateHandle.get<WordUiState>(WORD_UI_STATE)
+        if (restoredUiState != null) {
+            _wordUiState.value = restoredUiState
+            allWords = savedStateHandle.get<List<Word>>(ALL_WORDS) ?: emptyList()
         } else {
-            Log.e(TAG, "init: catId is 0, this is not expected")
+            getAllWords(catId)
         }
-        Log.d(TAG, "init: end")
-    }
-
-    fun updateFilter(filter: WordFilter) {
-        Log.d(TAG, "updateFilter: start, filter = $filter")
-        _wordUiState.update {
-            it.copy(currentFilter = filter)
-        }
-        if (catId != 0) {
-            getWords(catId)
-        } else {
-            Log.e(TAG, "updateFilter: catId is 0, this is not expected")
-        }
-        Log.d(TAG, "updateFilter: end")
-    }
-
-    private fun getWords(catId: Int) {
-        Log.d(TAG, "getWords: start, catId = $catId")
         viewModelScope.launch {
-            _wordUiState.update { it.copy(isLoading = true) } // Загрузка началась
-            wordRepository.getWordsByCategoryId(catId).collect { words ->
-                Log.d(TAG, "getWords: collect, words = $words")
-                // 1. Применяем фильтр
-                val filteredWords = when (_wordUiState.value.currentFilter) {
-                    WordFilter.ALL -> words
-                    WordFilter.LEARNED -> words.filter { it.is_learned }
-                    WordFilter.NOT_LEARNED -> words.filter { !it.is_learned }
-                    WordFilter.IMPORTANT -> words.filter { it.is_important }
-                }
-                _wordUiState.update {
-                    it.copy(
-                        wordList = filteredWords,
-                        isLoading = false
-                    )
-                }
-                Log.d(TAG, "getWords: collect, filteredWords = $filteredWords")
+            allWordsFlow.collectLatest {
+                allWords = it
+                filterWords()
             }
         }
-        Log.d(TAG, "getWords: end")
     }
 
-    fun updateWord(word: Word) {
-        Log.d(TAG, "updateWord: start, word = $word")
+    private fun getAllWords(catId: Int) {
         viewModelScope.launch {
-            wordRepository.updateWord(word)
+            _wordUiState.update { it.copy(isLoading = true) }
+            delay(2000)
+            allWordsFlow = wordRepository.getWordsByCategoryId(catId).map { list ->
+                list.map { it.toWord() }
+            }
+            Log.d("WordViewModel", "getAllWords: catId = $catId")
         }
-        Log.d(TAG, "updateWord: end")
     }
 
-    fun getLearnedWordsCountByCatId(catId: Int): Flow<Int> {
-        Log.d(TAG, "getLearnedWordsCountByCatId: start, catId = $catId")
-        val result = wordRepository.getLearnedWordsCountByCategoryId(catId)
-        Log.d(TAG, "getLearnedWordsCountByCatId: end")
-        return result
+    private fun filterWords() {
+        val filteredWords = when (WordFilter.values()[mode]) {
+            WordFilter.ALL -> allWords
+            WordFilter.LEARNED -> allWords.filter { it.isLearned }
+            WordFilter.NOT_LEARNED -> allWords.filter { !it.isLearned }
+            WordFilter.IMPORTANT -> allWords.filter { it.isImportant }
+        }
+        _wordUiState.update {
+            it.copy(
+                words = filteredWords,
+                size = filteredWords.size,
+                currentWord = filteredWords.firstOrNull(),
+                index = 0,
+                isLoading = false,
+                mode = mode
+            )
+        }
+        savedStateHandle[WORD_UI_STATE] = _wordUiState.value
     }
 
-    fun hasWordsInCategory(categoryId: Int): Flow<Boolean> {
-        Log.d(TAG, "hasWordsInCategory: start, categoryId = $categoryId")
-        val result = wordRepository.getWordsByCategoryId(categoryId).map { words ->
-            Log.d(TAG, "hasWordsInCategory: map, words = $words")
-            words.isNotEmpty()
+    fun changeMode(mode: Int) {
+        this.mode = mode
+        savedStateHandle[FILTER] = mode
+        filterWords()
+        _wordUiState.update {
+            it.copy(
+                mode = mode
+            )
         }
-        Log.d(TAG, "hasWordsInCategory: end")
-        return result
     }
-    suspend fun getProgressForCategory(categoryId: Int): Float {
-        Log.d(TAG, "getProgressForCategory: start, categoryId = $categoryId")
-        return withContext(viewModelScope.coroutineContext) {
-            wordRepository.getProgressForCategory(categoryId)
+
+    fun onSwipe(isRight: Boolean) {
+        if (isRight) {
+            if (_wordUiState.value.index < _wordUiState.value.size - 1) {
+                _wordUiState.update {
+                    it.copy(
+                        index = it.index + 1,
+                        currentWord = it.words[it.index + 1]
+                    )
+                }
+            }
+        } else {
+            if (_wordUiState.value.index > 0) {
+                _wordUiState.update {
+                    it.copy(
+                        index = it.index - 1,
+                        currentWord = it.words[it.index - 1]
+                    )
+                }
+            }
         }
-        Log.d(TAG, "getProgressForCategory: end")
+    }
+
+    fun onLearnedClicked(word: Word) {
+        viewModelScope.launch {
+            wordRepository.updateWord(word.toWordEntity().copy(is_learned = !word.isLearned))
+        }
+    }
+
+    fun onImportantClicked(word: Word) {
+        viewModelScope.launch {
+            wordRepository.updateWord(word.toWordEntity().copy(is_important = !word.isImportant))
+        }
+    }
+
+    private fun WordEntity.toWord(): Word {
+        return Word(
+            id = id,
+            categoryId = catId,
+            word = name,
+            translate = transl,
+            transcription = transcr,
+            isLearned = is_learned,
+            isImportant = is_important
+        )
+    }
+
+    private fun Word.toWordEntity(): WordEntity {
+        return WordEntity(
+            id = id,
+            catId = categoryId,
+            name = word,
+            transl = translate,
+            transcr = transcription,
+            is_learned = isLearned,
+            is_important = isImportant
+        )
+    }
+
+    fun getProgressForCategory(categoryId: Int): Flow<Float> = flow {
+        Log.d(TAG, "getProgressForCategory: called, categoryId = $categoryId")
+        val progress = wordRepository.getProgressForCategory(categoryId)
+        emit(progress)
+    }.flowOn(Dispatchers.IO)
+
+    companion object {
+        const val FILTER = "filter"
+        const val CATEGORY_ID = "category_id"
+        const val WORD_UI_STATE = "word_ui_state"
+        const val ALL_WORDS = "all_words"
+        private const val TAG = "WordViewModel"
     }
 }

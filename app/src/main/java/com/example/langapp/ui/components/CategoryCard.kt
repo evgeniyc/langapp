@@ -22,12 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.langapp.data.entities.Category
+import com.example.langapp.data.entities.CategoryEntity
 import com.example.langapp.navigation.Screen
 
 @Composable
 fun CategoryCard(
-    category: Category,
+    category: CategoryEntity,
     navController: NavController,
     progress: Float,
     modifier: Modifier = Modifier
@@ -36,7 +36,7 @@ fun CategoryCard(
     Card(
         modifier = modifier
             .clickable {
-                navController.navigate(Screen.WordList.createRoute(category.id))
+                navController.navigate(Screen.WordList.createRoute(catId = category.id, mode = 0))
             }
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp)

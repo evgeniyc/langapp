@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -25,13 +26,14 @@ import com.example.langapp.ui.WordFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordListTopBar(
+fun WordTopBar(
     title: String,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFilterChange: (WordFilter) -> Unit = {},
     expanded: Boolean,
     componentSize: IntSize,
+    mode: Int, // Добавлен параметр mode
     textStyle: TextStyle = MaterialTheme.typography.headlineLarge
 ) {
     TopAppBar(
@@ -56,25 +58,45 @@ fun WordListTopBar(
                     }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Рабочий список") },
+                        text = {
+                            Text(
+                                text = "Рабочий список",
+                                fontWeight = if (mode == WordFilter.NOT_LEARNED.ordinal) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
                         onClick = {
                             onFilterChange(WordFilter.NOT_LEARNED)
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Только Важные") },
+                        text = {
+                            Text(
+                                text = "Только Важные",
+                                fontWeight = if (mode == WordFilter.IMPORTANT.ordinal) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
                         onClick = {
                             onFilterChange(WordFilter.IMPORTANT)
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Только Изученные") },
+                        text = {
+                            Text(
+                                text = "Только Изученные",
+                                fontWeight = if (mode == WordFilter.LEARNED.ordinal) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
                         onClick = {
-                            onFilterChange(WordFilter.LEARNED)
+                            onFilterChange(WordFilter.LEARNED) // Исправлено: WordFilter.LEARNED
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Все вместе") },
+                        text = {
+                            Text(
+                                text = "Все вместе",
+                                fontWeight = if (mode == WordFilter.ALL.ordinal) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
                         onClick = {
                             onFilterChange(WordFilter.ALL)
                         }
