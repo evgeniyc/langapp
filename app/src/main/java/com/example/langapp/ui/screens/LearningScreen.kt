@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,10 +37,13 @@ import kotlin.math.roundToInt
 fun LearningScreen(
     wordViewModel: WordViewModel, catId: Int, navController: NavController
 ) {
-    wordViewModel.savedStateHandle[WordViewModel.CATEGORY_ID] = catId
     val wordUiState by wordViewModel.wordUiState.collectAsState()
     var isFlipped by remember { mutableStateOf(false) }
     var offsetX by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(key1 = catId) {
+        wordViewModel.changeMode(wordUiState.mode)
+    }
 
     CommonScreen(
         topBar = { TopBar(title = "Обучение") },
@@ -64,38 +68,36 @@ fun LearningScreen(
                                 wordsSize = wordUiState.size,
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            wordUiState.currentWord?.let {
-                                LearningCard(
-                                    currentWord = it,
-                                    isFlipped = isFlipped,
-                                    onCardClick = {
-                                        isFlipped = !isFlipped
-                                    },
-                                    onLearnedClicked = { word ->
-                                        wordViewModel.onLearnedClicked(word)
-                                    },
-                                    onImportantClicked = { word ->
-                                        wordViewModel.onImportantClicked(word)
-                                    },
-                                    modifier = Modifier
-                                        .offset { IntOffset(offsetX.roundToInt(), 0) }
-                                        .draggable(orientation = Orientation.Horizontal,
-                                            state = rememberDraggableState { delta ->
-                                                offsetX += delta
-                                            },
-                                            onDragStopped = { velocity ->
-                                                if (offsetX > 100) {
-                                                    wordViewModel.onSwipe(false)
-                                                } else if (offsetX < -100) {
-                                                    wordViewModel.onSwipe(true)
-                                                }
-                                                offsetX = 0f
-                                                isFlipped = false
+                            LearningCard(
+                                currentWord = wordUiState.currentWord,
+                                isFlipped = isFlipped,
+                                onCardClick = {
+                                    isFlipped = !isFlipped
+                                },
+                                onLearnedClicked = { currentWord ->
+                                    wordViewModel.onLearnedClicked(currentWord)
+                                },
+                                onImportantClicked = { word ->
+                                    wordViewModel.onImportantClicked(word)
+                                },
+                                modifier = Modifier
+                                    .offset { IntOffset(offsetX.roundToInt(), 0) }
+                                    .draggable(orientation = Orientation.Horizontal,
+                                        state = rememberDraggableState { delta ->
+                                            offsetX += delta
+                                        },
+                                        onDragStopped = { velocity ->
+                                            if (offsetX > 100) {
+                                                wordViewModel.onSwipe(false)
+                                            } else if (offsetX < -100) {
+                                                wordViewModel.onSwipe(true)
                                             }
+                                            offsetX = 0f
+                                            isFlipped = false
+                                        }
 
-                                        )
-                                )
-                            } ?: Text(text = "Список с этими параметрами пуст")
+                                    )
+                            )
                         }
                     }
                 }
@@ -104,7 +106,7 @@ fun LearningScreen(
         bottomBar = {
             NavBar(
                 onLeftClick = {
-                    navController.navigate(Screen.WordList.createRoute(catId, wordUiState.mode))
+                    navController.navigate(Screen.WordList.createRoute(catId))
 
                 },
                 onRightClick = {
@@ -113,8 +115,6 @@ fun LearningScreen(
                 },
                 leftText = "Назад",
                 rightText = "Категории",
-                catId = catId,
-                mode = wordUiState.mode // Используем wordUiState.mode
             )
         }
     )

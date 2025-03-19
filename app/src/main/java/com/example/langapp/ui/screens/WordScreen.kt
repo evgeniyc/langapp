@@ -95,8 +95,7 @@ fun WordScreen(
                 },
                 leftText = "Категории",
                 rightText = "Начать",
-                catId = catId,
-                mode = wordUiState.mode
+
             )
         }
     )

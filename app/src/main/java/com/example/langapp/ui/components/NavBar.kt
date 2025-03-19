@@ -21,8 +21,7 @@ fun NavBar(
     rightText: String = "Вперед",
     onLeftClick: () -> Unit,
     onRightClick: () -> Unit,
-    catId: Int,
-    mode: Int
+
 ) {
     Row(
         modifier = modifier
@@ -60,5 +59,5 @@ fun NavBar(
 @Preview(showBackground = true)
 @Composable
 fun NavBarPreview() {
-    NavBar(onLeftClick = {}, onRightClick = {}, catId = 0, mode = 0)
+    NavBar(onLeftClick = {}, onRightClick = {})
 }

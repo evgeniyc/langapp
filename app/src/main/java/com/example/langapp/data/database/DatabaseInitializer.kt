@@ -2,8 +2,8 @@ package com.example.langapp.data.database
 
 import android.content.Context
 import android.util.Log
-import androidx.preference.forEach
-import androidx.preference.size
+//import androidx.preference.forEach
+//import androidx.preference.size
 import com.example.langapp.constants.Categories
 import com.example.langapp.constants.Words
 import com.example.langapp.data.entities.CategoryEntity
@@ -82,7 +82,7 @@ object DatabaseInitializer {
     }
 
     private suspend fun addOrDeleteWords(
-        wordDao: com.example.langapp.database.WordDao,
+        wordDao: com.example.langapp.data.database.WordDao,
         wordsToAdd: List<WordEntity>,
         wordsToDelete: List<WordEntity>
     ) {

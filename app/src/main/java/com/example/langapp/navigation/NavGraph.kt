@@ -12,7 +12,6 @@ import com.example.langapp.ui.screens.CategoryScreen
 import com.example.langapp.ui.screens.LearningScreen
 import com.example.langapp.ui.screens.WordScreen
 import com.example.langapp.ui.viewmodels.CategoryViewModel
-import com.example.langapp.ui.WordFilter
 import com.example.langapp.ui.viewmodels.WordViewModel
 
 @Composable
@@ -35,11 +34,9 @@ fun NavGraph(
             route = Screen.WordList.route,
             arguments = listOf(
                 navArgument("catId") { type = NavType.IntType },
-                navArgument("mode") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val catId = backStackEntry.arguments?.getInt("catId") ?: 0
-            val mode = backStackEntry.arguments?.getInt("mode") ?: WordFilter.NOT_LEARNED.ordinal
             val wordViewModel: WordViewModel = viewModel(
                 factory = AppViewModelProvider.Factory(catId),
             )
@@ -47,18 +44,15 @@ fun NavGraph(
                 wordViewModel = wordViewModel,
                 navController = navController,
                 catId = catId,
-                //mode = mode
             )
         }
         composable(
             route = Screen.Learning.route,
             arguments = listOf(
                 navArgument("catId") { type = NavType.IntType },
-                navArgument("mode") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val catId = backStackEntry.arguments?.getInt("catId") ?: 0
-            val mode = backStackEntry.arguments?.getInt("mode") ?: WordFilter.NOT_LEARNED.ordinal
             val wordViewModel: WordViewModel = viewModel(
                 factory = AppViewModelProvider.Factory(catId),
             )
@@ -73,11 +67,13 @@ fun NavGraph(
 
 sealed class Screen(val route: String) {
     object CategoryList : Screen("category_list")
-    object WordList : Screen("word_list/{catId}/{mode}") {
-        fun createRoute(catId: Int, mode: Int) = "word_list/$catId/$mode"
+    object WordList : Screen("word_list/{catId}") {
+        fun createRoute(catId: Int, mode: Int) = "word_list/$catId"
+        fun createRoute(catId: Int) = "word_list/$catId"
     }
 
-    object Learning : Screen("learning/{catId}/{mode}") {
-        fun createRoute(catId: Int, mode: Int) = "learning/$catId/$mode"
+    object Learning : Screen("learning/{catId}") {
+        fun createRoute(catId: Int, mode: Int) = "learning/$catId"
+        fun createRoute(catId: Int) = "learning/$catId"
     }
 }

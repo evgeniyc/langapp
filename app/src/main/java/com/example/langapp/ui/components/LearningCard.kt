@@ -20,11 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,15 +35,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.langapp.data.entities.WordEntity
+import com.example.langapp.data.Word
 
 @Composable
 fun LearningCard(
-    currentWord: WordEntity,
+    currentWord: Word,
     isFlipped: Boolean,
     onCardClick: () -> Unit,
-    onLearnedClicked: (WordEntity) -> Unit,
-    onImportantClicked: (WordEntity) -> Unit,
+    onLearnedClicked: (Word) -> Unit,
+    onImportantClicked: (Word) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val rotationYState by animateFloatAsState(
@@ -88,7 +88,7 @@ fun LearningCard(
                         Icon(
                             imageVector = Icons.Filled.Check,
                             contentDescription = "Изучено",
-                            tint = if (currentWord.is_learned) Color.Green else Color.Gray
+                            tint = if (currentWord.isLearned) Color.Green else Color.Gray
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -101,9 +101,9 @@ fun LearningCard(
                             .padding(16.dp)
                     ) {
                         Icon(
-                            imageVector = if (currentWord.is_important) Icons.Filled.Star else Icons.Outlined.Star,
+                            imageVector = if (currentWord.isImportant) Icons.Filled.Star else Icons.Outlined.Star,
                             contentDescription = "Важное",
-                            tint = if (currentWord.is_important) Color.Yellow else Color.Gray
+                            tint = if (currentWord.isImportant) Color.Yellow else Color.Gray
                         )
                     }
                 }
@@ -124,14 +124,14 @@ fun LearningCard(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = currentWord.name,
+                                    text = currentWord.word,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = currentWord.transcr,
+                                    text = currentWord.transcription,
                                     fontSize = 18.sp,
                                     color = Color.Gray,
                                 )
@@ -143,7 +143,7 @@ fun LearningCard(
                             exit = fadeOut(animationSpec = tween(durationMillis = 300))
                         ) {
                             Text(
-                                text = currentWord.transl,
+                                text = currentWord.translate,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,

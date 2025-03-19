@@ -3,8 +3,8 @@ package com.example.langapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.langapp.data.database.LangDatabase
-import com.example.langapp.data.dao.CategoryDao
-import com.example.langapp.data.dao.WordDao
+import com.example.langapp.data.database.CategoryDao
+import com.example.langapp.data.database.WordDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

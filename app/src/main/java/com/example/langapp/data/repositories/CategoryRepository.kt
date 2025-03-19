@@ -1,6 +1,6 @@
 package com.example.langapp.data.repositories
 
-import com.example.langapp.database.CategoryDao
+import com.example.langapp.data.database.CategoryDao
 import com.example.langapp.data.entities.CategoryEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -17,12 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.langapp.data.entities.WordEntity
+import com.example.langapp.data.Word
 
 @Composable
 fun WordCard(
     modifier: Modifier = Modifier,
-    word: WordEntity,
+    word: Word,
     ) {
     Card(
         modifier = modifier
@@ -39,13 +39,13 @@ fun WordCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = word.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = word.transcr, style = MaterialTheme.typography.bodySmall)
+                Text(text = word.word, style = MaterialTheme.typography.titleMedium)
+                Text(text = word.transcription, style = MaterialTheme.typography.bodySmall)
 
             }
 
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = word.transl, style = MaterialTheme.typography.bodyMedium)
+            Text(text = word.translate, style = MaterialTheme.typography.bodyMedium)
 
         }
     }

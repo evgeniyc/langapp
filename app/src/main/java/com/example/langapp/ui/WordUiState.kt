@@ -1,12 +1,16 @@
 package com.example.langapp.ui
 
-import com.example.langapp.data.Word // Правильный импорт
+import android.os.Parcelable
+import com.example.langapp.data.Word
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
+@Parcelize
 data class WordUiState(
+    val words: @RawValue List<Word> = emptyList(),
+    val size: Int = 0,
+    val currentWord: @RawValue Word = Word(),
+    val index: Int = 0,
     val isLoading: Boolean = false,
-    val mode: Int = WordFilter.NOT_LEARNED.ordinal, // Текущий режим фильтрации
-    val size: Int = 0, // Размер списка слов
-    val index: Int = 0, // Индекс текущего слова
-    val currentWord: Word? = null, // Текущее слово (изменено на Word)
-    val words: List<Word> = emptyList(), // Список слов (изменено на List<Word>)
-)
+    val mode: Int = 0
+) : Parcelable

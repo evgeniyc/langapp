@@ -1,7 +1,7 @@
 package com.example.langapp.data.repositories
 
 import android.util.Log
-import com.example.langapp.database.WordDao
+import com.example.langapp.data.database.WordDao
 import com.example.langapp.data.entities.WordEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
