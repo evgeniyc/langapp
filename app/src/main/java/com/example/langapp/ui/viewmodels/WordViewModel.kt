@@ -46,7 +46,14 @@ class WordViewModel @Inject constructor(
     private val filteredWords: StateFlow<List<Word>> = _filteredWords.asStateFlow()
 
     init {
+        catId = savedStateHandle.get<Int>("catId") ?: 0
         val restoredUiState = savedStateHandle.get<WordUiState>(WORD_UI_STATE)
+        val newCatId = savedStateHandle.get<Int>(NEW_CATEGORY_ID)
+        if (newCatId != null) {
+            catId = newCatId
+            mode = WordFilter.NOT_LEARNED.ordinal
+            savedStateHandle[NEW_CATEGORY_ID] = null
+        }
         viewModelScope.launch {
             wordRepository.getWordsByCategoryId(catId).map { list ->
                 list.map { it.toWord() }
@@ -75,7 +82,8 @@ class WordViewModel @Inject constructor(
                 currentWord = filteredWords.firstOrNull() ?: Word(),
                 index = if (filteredWords.isEmpty()) 0 else it.index,
                 isLoading = false,
-                mode = mode
+                mode = mode,
+                catId = catId
             )
         }
         savedStateHandle[WORD_UI_STATE] = _wordUiState.value
@@ -165,6 +173,7 @@ class WordViewModel @Inject constructor(
         const val FILTER = "filter"
         const val CATEGORY_ID = "category_id"
         const val WORD_UI_STATE = "word_ui_state"
+        const val NEW_CATEGORY_ID = "new_category_id"
         private const val TAG = "WordViewModel"
     }
 }

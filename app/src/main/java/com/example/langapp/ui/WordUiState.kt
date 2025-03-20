@@ -12,5 +12,6 @@ data class WordUiState(
     val currentWord: @RawValue Word = Word(),
     val index: Int = 0,
     val isLoading: Boolean = false,
-    val mode: Int = 0
+    val mode: Int = WordFilter.NOT_LEARNED.ordinal,
+    val catId: Int = 0
 ) : Parcelable

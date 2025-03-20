@@ -25,41 +25,52 @@ fun NavGraph(
         composable(route = Screen.CategoryList.route) {
             val categoryViewModel: CategoryViewModel =
                 viewModel(factory = AppViewModelProvider.Factory())
+            val wordViewModel: WordViewModel = viewModel(factory = AppViewModelProvider.Factory())
             CategoryScreen(
-                navController = navController,
-                categoryViewModel = categoryViewModel
+                categoryViewModel = categoryViewModel,
+                wordViewModel = wordViewModel,
+                onNavigateToWordList = { catId ->
+                    navController.navigate(Screen.WordList.createRoute(catId))
+                }
             )
         }
         composable(
             route = Screen.WordList.route,
             arguments = listOf(
-                navArgument("catId") { type = NavType.IntType },
+                navArgument("catId") {
+                    type = NavType.IntType
+                    nullable = false
+                },
             )
         ) { backStackEntry ->
-            val catId = backStackEntry.arguments?.getInt("catId") ?: 0
+            val catId = backStackEntry.arguments?.getInt("catId") ?: throw IllegalStateException("catId is null")
             val wordViewModel: WordViewModel = viewModel(
                 factory = AppViewModelProvider.Factory(catId),
             )
             WordScreen(
                 wordViewModel = wordViewModel,
-                navController = navController,
-                catId = catId,
+                onNavigateToLearning = {
+                    navController.navigate(Screen.Learning.createRoute())
+                },
+                onNavigateToCategoryList = {
+                    navController.navigate(Screen.CategoryList.route)
+                }
             )
         }
         composable(
             route = Screen.Learning.route,
-            arguments = listOf(
-                navArgument("catId") { type = NavType.IntType },
-            )
-        ) { backStackEntry ->
-            val catId = backStackEntry.arguments?.getInt("catId") ?: 0
+        ) {
             val wordViewModel: WordViewModel = viewModel(
-                factory = AppViewModelProvider.Factory(catId),
+                factory = AppViewModelProvider.Factory(0),
             )
             LearningScreen(
                 wordViewModel = wordViewModel,
-                catId = catId,
-                navController = navController,
+                onNavigateToWordList = {
+                    navController.navigate(Screen.WordList.createRoute(0))
+                },
+                onNavigateToCategoryList = {
+                    navController.navigate(Screen.CategoryList.route)
+                }
             )
         }
     }
@@ -68,12 +79,10 @@ fun NavGraph(
 sealed class Screen(val route: String) {
     object CategoryList : Screen("category_list")
     object WordList : Screen("word_list/{catId}") {
-        fun createRoute(catId: Int, mode: Int) = "word_list/$catId"
         fun createRoute(catId: Int) = "word_list/$catId"
     }
 
-    object Learning : Screen("learning/{catId}") {
-        fun createRoute(catId: Int, mode: Int) = "learning/$catId"
-        fun createRoute(catId: Int) = "learning/$catId"
+    object Learning : Screen("learning") {
+        fun createRoute() = "learning"
     }
 }

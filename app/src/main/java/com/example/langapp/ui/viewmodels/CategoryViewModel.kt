@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class CategoryViewModel(categoryRepository: CategoryRepository) : ViewModel() {
+class CategoryViewModel(
+    private val categoryRepository: CategoryRepository
+) : ViewModel() {
     val categoryUiState: StateFlow<CategoryUiState> =
         categoryRepository.getAllCategories().map {
-            Log.d("CategoryListViewModel", "Categories loaded: ${it.size}") // Добавлено логирование
+            Log.d("CategoryListViewModel", "Categories loaded: ${it.size}")
             CategoryUiState(it)
         }
             .stateIn(
@@ -23,6 +25,6 @@ class CategoryViewModel(categoryRepository: CategoryRepository) : ViewModel() {
             )
 
     init {
-        Log.d("CategoryListViewModel", "ViewModel initialized") // Добавлено логирование
+        Log.d("CategoryListViewModel", "ViewModel initialized")
     }
 }
