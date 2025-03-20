@@ -12,21 +12,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.example.langapp.ui.components.CategoryCard
 import com.example.langapp.ui.components.CommonScreen
 import com.example.langapp.ui.components.TopBar
 import com.example.langapp.ui.viewmodels.CategoryViewModel
 import com.example.langapp.ui.viewmodels.WordViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun CategoryScreen(
-    navController: NavController,
     categoryViewModel: CategoryViewModel,
-    wordViewModel: WordViewModel = hiltViewModel()
+    wordViewModel: WordViewModel,
+    onNavigateToWordList: (Int) -> Unit
 ) {
     Log.d("CategoryScreen", "CategoryScreen: called")
     val categories by categoryViewModel.categoryUiState.collectAsState()
@@ -47,8 +43,8 @@ fun CategoryScreen(
                         .collectAsState(initial = 0f)
                     CategoryCard(
                         category = category,
-                        navController = navController,
-                        progress = progress
+                        progress = progress,
+                        onCardClick = { onNavigateToWordList(category.id) }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

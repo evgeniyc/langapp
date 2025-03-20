@@ -21,22 +21,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.langapp.data.entities.CategoryEntity
-import com.example.langapp.navigation.Screen
 
 @Composable
 fun CategoryCard(
     category: CategoryEntity,
-    navController: NavController,
     progress: Float,
+    onCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val TAG = "CategoryCard"
     Card(
         modifier = modifier
             .clickable {
-                navController.navigate(Screen.WordList.createRoute(catId = category.id, mode = 0))
+                onCardClick()
             }
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -87,7 +85,7 @@ fun CategoryCard(
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
-         }
+        }
         Spacer(modifier = Modifier.height(4.dp))
     }
     Log.d(TAG, "CategoryCard: end")
