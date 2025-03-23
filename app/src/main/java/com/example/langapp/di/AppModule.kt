@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.example.langapp.data.database.LangDatabase
 import com.example.langapp.data.database.CategoryDao
 import com.example.langapp.data.database.WordDao
+import com.example.langapp.data.repositories.CategoryRepository
+import com.example.langapp.data.repositories.WordRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +24,7 @@ object AppModule {
         return Room.databaseBuilder(
             context,
             LangDatabase::class.java,
-            "lang_database" // Изменено имя базы данных
+            "lang_database"
         ).build()
     }
 
@@ -34,5 +36,17 @@ object AppModule {
     @Provides
     fun provideCategoryDao(appDatabase: LangDatabase): CategoryDao {
         return appDatabase.categoryDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryRepository(categoryDao: CategoryDao): CategoryRepository {
+        return CategoryRepository(categoryDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWordRepository(wordDao: WordDao): WordRepository {
+        return WordRepository(wordDao)
     }
 }

@@ -13,5 +13,16 @@ data class WordUiState(
     val index: Int = 0,
     val isLoading: Boolean = false,
     val mode: Int = WordFilter.NOT_LEARNED.ordinal,
-    val catId: Int = 0
+    val catId: Int = 0,
+    val isRightSwipe: Boolean = false,
+    val animationState: AnimationState = AnimationState.NONE,
+    val currentFilter: WordFilter = WordFilter.NOT_LEARNED,
+    val isIconChanged: Boolean = false
 ) : Parcelable
+
+enum class AnimationState {
+    NONE,
+    SWIPE_LEFT,
+    SWIPE_RIGHT,
+    DELETE
+}

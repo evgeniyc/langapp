@@ -1,15 +1,9 @@
 package com.example.langapp.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import android.util.Log
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,142 +13,102 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.langapp.data.Word
+import com.example.langapp.ui.WordFilter
 
 @Composable
 fun LearningCard(
-    currentWord: Word,
-    isFlipped: Boolean,
-    onCardClick: () -> Unit,
-    onLearnedClicked: (Word) -> Unit,
-    onImportantClicked: (Word) -> Unit,
+    word: Word,
+    onLearnedClicked: (word: Word, filter: WordFilter) -> Unit,
+    onImportantClicked: (word: Word, filter: WordFilter) -> Unit,
+    currentFilter: WordFilter,
+    isFront: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val rotationYState by animateFloatAsState(
-        targetValue = if (isFlipped) 180f else 0f,
-        animationSpec = tween(durationMillis = 300), label = ""
-    )
-    Box(
-        modifier = modifier
-    )
-    {
-        Card(
+    Log.d(TAG, "LearningCard: called")
+    Card(
+        modifier = modifier.
+        border(1.dp, Color.Gray, RoundedCornerShape(6.dp)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), // Используем elevation
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    ) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp))
-                .clickable {
-                    onCardClick()
-                }
-                .graphicsLayer {
-                    rotationY = rotationYState
-                    cameraDistance = 8f * density
-                },
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
+                .padding(16.dp)
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+            if (isFront) {
+                IconButton(
+                    onClick = { onLearnedClicked(word, currentFilter) },
+                    modifier = Modifier.align(Alignment.TopStart)
                 ) {
-                    // Птичка
-                    IconButton(
-                        onClick = {
-                            onLearnedClicked(currentWord)
-                        },
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = "Изучено",
-                            tint = if (currentWord.isLearned) Color.Green else Color.Gray
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    // Звездочка
-                    IconButton(
-                        onClick = {
-                            onImportantClicked(currentWord)
-                        },
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (currentWord.isImportant) Icons.Filled.Star else Icons.Outlined.Star,
-                            contentDescription = "Важное",
-                            tint = if (currentWord.isImportant) Color.Yellow else Color.Gray
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = "Learned",
+                        tint = if (word.isLearned) Color.Green else Color.Gray
+                    )
+                }
+                IconButton(
+                    onClick = { onImportantClicked(word, currentFilter) },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Important",
+                        tint = if (word.isImportant) Color.Yellow else Color.Gray
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 48.dp)
+                ) {
+                    Text(
+                        text = word.word,
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (word.transcription.isNotEmpty()) {
+                        Text(
+                            text = "[${word.transcription}]",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
+            } else {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        AnimatedVisibility(
-                            visible = !isFlipped,
-                            enter = fadeIn(animationSpec = tween(durationMillis = 300)),
-                            exit = fadeOut(animationSpec = tween(durationMillis = 300))
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = currentWord.word,
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = currentWord.transcription,
-                                    fontSize = 18.sp,
-                                    color = Color.Gray,
-                                )
-                            }
-                        }
-                        AnimatedVisibility(
-                            visible = isFlipped,
-                            enter = fadeIn(animationSpec = tween(durationMillis = 300)),
-                            exit = fadeOut(animationSpec = tween(durationMillis = 300))
-                        ) {
-                            Text(
-                                text = currentWord.translate,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                modifier = Modifier.graphicsLayer {
-                                    rotationY = if (rotationYState > 90f) 180f else 0f
-                                }
-                            )
-                        }
-                    }
+                    Text(
+                        text = word.translate,
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Center,
+                        )
                 }
+
             }
         }
     }
 }
+
+private const val TAG = "LearningCard"

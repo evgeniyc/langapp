@@ -21,12 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.langapp.data.entities.CategoryEntity
+import com.example.langapp.data.Category
 
 @Composable
 fun CategoryCard(
-    category: CategoryEntity,
-    progress: Float,
+    category: Category,
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -64,10 +63,10 @@ fun CategoryCard(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 0.dp)
             )
-            if (progress > 0f) {
-                Log.d("CategoryCard", "CategoryCard: progress = $progress")
+            if (category.progress > 0f) {
+                Log.d("CategoryCard", "CategoryCard: progress = $category.progress")
                 Text(
-                    text = "Progess: ${(progress * 100).toInt()}%",
+                    text = "Progess: ${(category.progress * 100).toInt()}%",
                     fontSize = 12.sp,
                     textAlign = TextAlign.End,
                     modifier = Modifier
@@ -75,7 +74,7 @@ fun CategoryCard(
                         .padding(top = 0.dp)
                 )
                 LinearProgressIndicator(
-                    progress = { progress },
+                    progress = category.progress,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
