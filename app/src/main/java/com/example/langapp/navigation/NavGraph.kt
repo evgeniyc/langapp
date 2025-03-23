@@ -1,5 +1,6 @@
 package com.example.langapp.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -15,21 +16,21 @@ import com.example.langapp.ui.viewmodels.CategoryViewModel
 import com.example.langapp.ui.viewmodels.WordViewModel
 
 @Composable
-fun NavGraph(
-) {
+fun NavGraph() {
+    Log.d(TAG, "NavGraph: called")
     val navController = rememberNavController()
+    val wordViewModel: WordViewModel = viewModel(factory = AppViewModelProvider.Factory)
     NavHost(
         navController = navController,
         startDestination = Screen.CategoryList.route,
     ) {
         composable(route = Screen.CategoryList.route) {
-            val categoryViewModel: CategoryViewModel =
-                viewModel(factory = AppViewModelProvider.Factory())
-            val wordViewModel: WordViewModel = viewModel(factory = AppViewModelProvider.Factory())
+            Log.d(TAG, "NavGraph: CategoryList route")
+            val categoryViewModel: CategoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
             CategoryScreen(
                 categoryViewModel = categoryViewModel,
-                wordViewModel = wordViewModel,
                 onNavigateToWordList = { catId ->
+                    Log.d(TAG, "NavGraph: navigate to WordList, catId = $catId")
                     navController.navigate(Screen.WordList.createRoute(catId))
                 }
             )
@@ -43,16 +44,18 @@ fun NavGraph(
                 },
             )
         ) { backStackEntry ->
+            Log.d(TAG, "NavGraph: WordList route")
             val catId = backStackEntry.arguments?.getInt("catId") ?: throw IllegalStateException("catId is null")
-            val wordViewModel: WordViewModel = viewModel(
-                factory = AppViewModelProvider.Factory(catId),
-            )
+            Log.d(TAG, "NavGraph: catId = $catId")
+            wordViewModel.setCategoryId(catId)
             WordScreen(
                 wordViewModel = wordViewModel,
                 onNavigateToLearning = {
+                    Log.d(TAG, "NavGraph: navigate to Learning")
                     navController.navigate(Screen.Learning.createRoute())
                 },
                 onNavigateToCategoryList = {
+                    Log.d(TAG, "NavGraph: navigate to CategoryList")
                     navController.navigate(Screen.CategoryList.route)
                 }
             )
@@ -60,15 +63,15 @@ fun NavGraph(
         composable(
             route = Screen.Learning.route,
         ) {
-            val wordViewModel: WordViewModel = viewModel(
-                factory = AppViewModelProvider.Factory(0),
-            )
+            Log.d(TAG, "NavGraph: Learning route")
             LearningScreen(
                 wordViewModel = wordViewModel,
                 onNavigateToWordList = {
-                    navController.navigate(Screen.WordList.createRoute(0))
+                    Log.d(TAG, "NavGraph: navigate to WordList from Learning")
+                    navController.navigate(Screen.WordList.createRoute(wordViewModel.getCategoryId()))
                 },
                 onNavigateToCategoryList = {
+                    Log.d(TAG, "NavGraph: navigate to CategoryList from Learning")
                     navController.navigate(Screen.CategoryList.route)
                 }
             )
@@ -86,3 +89,5 @@ sealed class Screen(val route: String) {
         fun createRoute() = "learning"
     }
 }
+
+private const val TAG = "NavGraph"

@@ -5,8 +5,9 @@ import com.example.langapp.data.entities.CategoryEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
-class CategoryRepository(private val categoryDao: CategoryDao) {
+class CategoryRepository @Inject constructor(private val categoryDao: CategoryDao) {
 
     suspend fun insertCategory(category: CategoryEntity) {
         categoryDao.insertCategory(category)

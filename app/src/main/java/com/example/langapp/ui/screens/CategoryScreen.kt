@@ -16,39 +16,47 @@ import com.example.langapp.ui.components.CategoryCard
 import com.example.langapp.ui.components.CommonScreen
 import com.example.langapp.ui.components.TopBar
 import com.example.langapp.ui.viewmodels.CategoryViewModel
-import com.example.langapp.ui.viewmodels.WordViewModel
+import com.example.langapp.data.Category
+import com.example.langapp.ui.CategoryUiState
 
 @Composable
 fun CategoryScreen(
     categoryViewModel: CategoryViewModel,
-    wordViewModel: WordViewModel,
     onNavigateToWordList: (Int) -> Unit
 ) {
     Log.d("CategoryScreen", "CategoryScreen: called")
-    val categories by categoryViewModel.categoryUiState.collectAsState()
-    Log.d("CategoryScreen", "CategoryScreen: categories.size = ${categories.categoryList.size}")
+    val categoriesUiState by categoryViewModel.categoryUiState.collectAsState()
+    Log.d("CategoryScreen", "CategoryScreen: categories.size = ${categoriesUiState.categories.size}")
 
     CommonScreen(
         topBar = {
             TopBar(title = "Категории")
         },
         content = { innerPadding ->
-            LazyColumn(
+            CategoryList(
+                categoriesUiState = categoriesUiState,
+                onNavigateToWordList = onNavigateToWordList,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-            ) {
-                items(categories.categoryList) { category ->
-                    val progress by wordViewModel.getProgressForCategory(category.id)
-                        .collectAsState(initial = 0f)
-                    CategoryCard(
-                        category = category,
-                        progress = progress,
-                        onCardClick = { onNavigateToWordList(category.id) }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
+            )
         }
     )
+}
+
+@Composable
+fun CategoryList(
+    categoriesUiState: CategoryUiState,
+    onNavigateToWordList: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
+        items(categoriesUiState.categories) { category ->
+            CategoryCard(
+                category = category,
+                onCardClick = { onNavigateToWordList(category.id) }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
 }

@@ -9,5 +9,6 @@ data class CategoryEntity(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "transl") val transl: String,
-    @ColumnInfo(name = "transcr") val transcr: String
+    @ColumnInfo(name = "transcr") val transcr: String,
+
 )

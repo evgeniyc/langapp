@@ -66,6 +66,7 @@ fun WordTopBar(
                         },
                         onClick = {
                             onFilterChange(WordFilter.NOT_LEARNED)
+                            onSettingsClick()
                         }
                     )
                     DropdownMenuItem(
@@ -77,6 +78,7 @@ fun WordTopBar(
                         },
                         onClick = {
                             onFilterChange(WordFilter.IMPORTANT)
+                            onSettingsClick()
                         }
                     )
                     DropdownMenuItem(
@@ -88,6 +90,7 @@ fun WordTopBar(
                         },
                         onClick = {
                             onFilterChange(WordFilter.LEARNED) // Исправлено: WordFilter.LEARNED
+                            onSettingsClick()
                         }
                     )
                     DropdownMenuItem(
@@ -99,6 +102,7 @@ fun WordTopBar(
                         },
                         onClick = {
                             onFilterChange(WordFilter.ALL)
+                            onSettingsClick()
                         }
                     )
                 }
