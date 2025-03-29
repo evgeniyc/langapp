@@ -1,2 +1,0 @@
-# langapp
-Lang Study Application
