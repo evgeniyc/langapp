@@ -32,15 +32,26 @@ private const val SWIPE_THRESHOLD = 100f
 
 @Composable
 fun AnimatedLearningCard(
+    modifier: Modifier = Modifier,
     words: List<Word>, // Список слов для обучения
+    mode: Int = 0, //
     currentIndex: Int, // Индекс текущего слова в списке
     onSwipe: (isRight: Boolean) -> Unit, // Функция, вызываемая при завершении свайпа, передает true если вправо, false если влево
     onLearnedClicked: (word: Word) -> Unit, // Функция, вызываемая при нажатии на кнопку "Выучено"
     onImportantClicked: (word: Word) -> Unit, // Функция, вызываемая при нажатии на кнопку "Важно"
-    modifier: Modifier = Modifier
+
 ) {
     // Состояние, определяющее, какая сторона карточки сейчас видна (true - передняя, false - задняя)
     var isFront by remember { mutableStateOf(true) }
+    // Состояние, определяющее, находится ли карточка в анимации свайпа
+    var isOutAnimating by remember { mutableStateOf(false) }
+    var isInAnimating by remember { mutableStateOf(false) }
+    // Текущее смещение карточки по оси X (горизонтальное смещение)
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    // Максимальное смещение карточки по оси X (горизонтальное смещение)
+    val swipeOffset = LocalConfiguration.current.screenWidthDp.dp.value * 1.5f
+    // Целевое смещение карточки по оси X, к которому стремится анимация (общее для обеих карточек)
+    var targetOffsetX by remember { mutableFloatStateOf(0f) }
     // Текущее слово, отображаемое на карточке, обновляется при смене индекса или списка слов
     val currentWord by remember(currentIndex, words) {
         mutableStateOf(words.getOrElse(currentIndex) { Word() })
@@ -55,13 +66,32 @@ fun AnimatedLearningCard(
             easing = LinearEasing // Тип анимации - линейное изменение
         ), label = "Card animated rotation"
     )
-    // Создаем анимированное значение для alpha лицевого слоя
-    val alphaFront by remember(rotationAnimation) {
+    var isFadeOut by remember { mutableStateOf(false) }
+    val fadeOutAnimation by animateFloatAsState(
+        targetValue = if (isFadeOut) 0f else 1f, // Прозрачность
+        animationSpec = tween(
+            durationMillis = 600, // Длительность анимации - 600 миллисекунд
+            easing = LinearEasing // Тип анимации - линейное изменение
+        ), label = "Card animated fading Out",
+        finishedListener = {
+            if(isFadeOut){
+                targetOffsetX = swipeOffset
+                isOutAnimating = true
+                isFadeOut = false
+            }
+        }
+    )
+
+    val alphaFront by remember(rotationAnimation, isFadeOut) {
         derivedStateOf {
-            if (rotationAnimation <= 90f) {
-                1f - rotationAnimation / 90f
+            if (isFadeOut) {
+                fadeOutAnimation
             } else {
-                0f
+                if (rotationAnimation <= 90f) {
+                    1f - rotationAnimation / 90f
+                } else {
+                    0f
+                }
             }
         }
     }
@@ -75,13 +105,8 @@ fun AnimatedLearningCard(
             }
         }
     }
-    // Состояние, определяющее, находится ли карточка в анимации свайпа
-    var isOutAnimating by remember { mutableStateOf(false) }
-    var isInAnimating by remember { mutableStateOf(false) }
-    // Текущее смещение карточки по оси X (горизонтальное смещение)
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    // Целевое смещение карточки по оси X, к которому стремится анимация (общее для обеих карточек)
-    var targetOffsetX by remember { mutableFloatStateOf(0f) }
+
+
     // Анимированное смещение карточки по оси X, которое изменяется в процессе анимации
     val animatedOffsetX by animateFloatAsState(
         targetValue = targetOffsetX, // Целевое значение для анимации
@@ -103,16 +128,9 @@ fun AnimatedLearningCard(
         }
     )
 
-    val swipeOffset = LocalConfiguration.current.screenWidthDp.dp.value * 1.5f
-
-    // Эффект, запускаемый при изменении isAnimating
-    /*unchedEffect(isAnimating) {
-         if (isAnimating) {
-             targetOffsetX = if (isRightSwipe) swipeOffset else -swipeOffset
-         }
-     }
- */
-Box(modifier = modifier.fillMaxSize()) {
+Box(modifier = modifier
+    //.fillMaxSize()
+) {
     // Box, содержащий дополнительную карточку
     Box(
         modifier = modifier
@@ -125,9 +143,9 @@ Box(modifier = modifier.fillMaxSize()) {
             .padding(top = 16.dp) // Отступ сверху - 16 dp
     ) {
         LearningCard(
-            // Отображаем переднюю сторону карточки
+            // Отображаем дополнительную карточку при необходимости
             word = currentWord, // Передаем текущее слово
-            onLearnedClicked = onLearnedClicked, // Передаем обработчик нажатия на кнопку "Выучено"
+            onLearned = onLearnedClicked,
             onImportantClicked = onImportantClicked, // Передаем обработчик нажатия на кнопку "Важно"
             frontCardAlpha = 1f,
             backCardAlpha = 0f
@@ -185,11 +203,13 @@ Box(modifier = modifier.fillMaxSize()) {
             }
     ) {
         LearningCard(
-            // Отображаем переднюю сторону карточки
+            // Отображаем дополнительную карточку
             word = currentWord, // Передаем текущее слово
-            onLearnedClicked = onLearnedClicked, // Передаем обработчик нажатия на кнопку "Выучено"
+            onLearned = {
+                isFadeOut = mode == 0
+                onLearnedClicked(currentWord)
+            },
             onImportantClicked = onImportantClicked, // Передаем обработчик нажатия на кнопку "Важно"
-            isFront = isFront,
             frontCardAlpha = alphaFront,
             backCardAlpha = alphaBack
         )
