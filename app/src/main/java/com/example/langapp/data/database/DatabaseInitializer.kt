@@ -3,8 +3,7 @@ package com.example.langapp.data.database
 import android.content.Context
 import android.util.Log
 import com.example.langapp.constants.Categories
-import com.example.langapp.constants.Words
-import com.example.langapp.data.entities.CategoryEntity
+import com.example.langapp.constants.AllWords
 import com.example.langapp.data.entities.CategoryTimeEntity
 import com.example.langapp.data.entities.WordEntity
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +17,7 @@ object DatabaseInitializer {
 
     fun initialize(context: Context) {
         Log.d("DatabaseInitializer", "initialize called")
-        applicationScope.launch { // Изменено на launch, чтобы не блокировать главный поток
+        applicationScope.launch {
             val database = LangDatabase.getDatabase(context)
             val categoryDao = database.categoryDao()
             val wordDao = database.wordDao()
@@ -27,7 +26,7 @@ object DatabaseInitializer {
             // Проверка и добавление категорий
             Log.d("DatabaseInitializer", "Checking if categories exist")
             val categories = try {
-                categoryDao.getAllCategories().firstOrNull() // Используем getAllCategories
+                categoryDao.getAllCategories().firstOrNull()
             } catch (e: Exception) {
                 Log.e("DatabaseInitializer", "Error getting categories", e)
                 null
@@ -48,6 +47,7 @@ object DatabaseInitializer {
             } else {
                 Log.d("DatabaseInitializer", "Categories already exist")
             }
+
             // Проверка и добавление времени для категорий
             Log.d("DatabaseInitializer", "Checking if category times exist")
             val categoryTimes = try {
@@ -72,17 +72,18 @@ object DatabaseInitializer {
             } else {
                 Log.d("DatabaseInitializer", "Category times already exist")
             }
+
             // Проверка и добавление/удаление слов
             Log.d("DatabaseInitializer", "Checking if words exist")
             val wordsInDb = try {
-                wordDao.getAllWords().firstOrNull() ?: emptyList() // Используем getAllWords
+                wordDao.getAllWords().firstOrNull() ?: emptyList()
             } catch (e: Exception) {
                 Log.e("DatabaseInitializer", "Error getting words", e)
                 emptyList()
             }
             Log.d("DatabaseInitializer", "Words found: ${wordsInDb.size}")
 
-            val wordsInConstants = Words.wordList
+            val wordsInConstants = AllWords.allWords
             val wordsToAdd = mutableListOf<WordEntity>()
             val wordsToDelete = mutableListOf<WordEntity>()
 
