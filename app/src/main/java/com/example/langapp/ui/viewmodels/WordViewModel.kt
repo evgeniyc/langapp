@@ -104,7 +104,7 @@ class WordViewModel @Inject constructor(
                 list.map { it.toWord() }
             }.first()
             _allWords.value = words
-            delay(2000)
+            delay(500)
             filterWords()
             _wordUiState.update { it.copy(isLoading = false) }
         }

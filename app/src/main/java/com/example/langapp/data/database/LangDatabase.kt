@@ -10,7 +10,7 @@ import com.example.langapp.data.entities.WordEntity
 
 @Database(
     entities = [CategoryEntity::class, WordEntity::class, CategoryTimeEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class LangDatabase : RoomDatabase() {
