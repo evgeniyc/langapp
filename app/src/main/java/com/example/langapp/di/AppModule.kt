@@ -2,10 +2,12 @@ package com.example.langapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.langapp.data.database.LangDatabase
 import com.example.langapp.data.database.CategoryDao
+import com.example.langapp.data.database.CategoryTimeDao
+import com.example.langapp.data.database.LangDatabase
 import com.example.langapp.data.database.WordDao
 import com.example.langapp.data.repositories.CategoryRepository
+import com.example.langapp.data.repositories.CategoryTimeRepository
 import com.example.langapp.data.repositories.WordRepository
 import dagger.Module
 import dagger.Provides
@@ -39,6 +41,11 @@ object AppModule {
     }
 
     @Provides
+    fun provideCategoryTimeDao(appDatabase: LangDatabase): CategoryTimeDao {
+        return appDatabase.categoryTimeDao()
+    }
+
+    @Provides
     @Singleton
     fun provideCategoryRepository(categoryDao: CategoryDao): CategoryRepository {
         return CategoryRepository(categoryDao)
@@ -48,5 +55,11 @@ object AppModule {
     @Singleton
     fun provideWordRepository(wordDao: WordDao): WordRepository {
         return WordRepository(wordDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryTimeRepository(categoryTimeDao: CategoryTimeDao): CategoryTimeRepository {
+        return CategoryTimeRepository(categoryTimeDao)
     }
 }

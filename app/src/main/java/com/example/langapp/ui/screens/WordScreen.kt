@@ -40,7 +40,6 @@ fun WordScreen(
     val wordUiState by wordViewModel.wordUiState.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     var componentSize by remember { mutableStateOf(IntSize.Zero) }
-    Log.d("WordScreen", "Mode: ${wordUiState.mode}")
     CommonScreen(
         topBar = {
             WordTopBar(

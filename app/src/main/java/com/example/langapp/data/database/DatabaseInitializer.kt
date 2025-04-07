@@ -2,11 +2,10 @@ package com.example.langapp.data.database
 
 import android.content.Context
 import android.util.Log
-//import androidx.preference.forEach
-//import androidx.preference.size
 import com.example.langapp.constants.Categories
 import com.example.langapp.constants.Words
 import com.example.langapp.data.entities.CategoryEntity
+import com.example.langapp.data.entities.CategoryTimeEntity
 import com.example.langapp.data.entities.WordEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +22,7 @@ object DatabaseInitializer {
             val database = LangDatabase.getDatabase(context)
             val categoryDao = database.categoryDao()
             val wordDao = database.wordDao()
+            val categoryTimeDao = database.categoryTimeDao()
 
             // Проверка и добавление категорий
             Log.d("DatabaseInitializer", "Checking if categories exist")
@@ -48,7 +48,30 @@ object DatabaseInitializer {
             } else {
                 Log.d("DatabaseInitializer", "Categories already exist")
             }
-
+            // Проверка и добавление времени для категорий
+            Log.d("DatabaseInitializer", "Checking if category times exist")
+            val categoryTimes = try {
+                categoryTimeDao.getAllCategoryTime().firstOrNull()
+            } catch (e: Exception) {
+                Log.e("DatabaseInitializer", "Error getting category times", e)
+                null
+            }
+            Log.d("DatabaseInitializer", "Category times found: ${categoryTimes?.size ?: 0}")
+            if (categoryTimes.isNullOrEmpty()) {
+                Log.d("DatabaseInitializer", "No category times found, inserting category times")
+                Categories.categoryList.forEach { category ->
+                    Log.d("DatabaseInitializer", "Inserting category time for: ${category.name}")
+                    try {
+                        categoryTimeDao.insertCategoryTime(CategoryTimeEntity(categoryId = category.id))
+                        Log.d("DatabaseInitializer", "Category time inserted for: ${category.name}")
+                    } catch (e: Exception) {
+                        Log.e("DatabaseInitializer", "Error inserting category time for: ${category.name}", e)
+                    }
+                }
+                Log.d("DatabaseInitializer", "Finished inserting category times")
+            } else {
+                Log.d("DatabaseInitializer", "Category times already exist")
+            }
             // Проверка и добавление/удаление слов
             Log.d("DatabaseInitializer", "Checking if words exist")
             val wordsInDb = try {

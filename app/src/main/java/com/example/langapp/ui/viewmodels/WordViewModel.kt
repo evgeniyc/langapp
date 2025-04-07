@@ -1,10 +1,14 @@
 package com.example.langapp.ui.viewmodels
 
+import android.os.CountDownTimer
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.langapp.data.Word
+import com.example.langapp.data.entities.CategoryTimeEntity
 import com.example.langapp.data.entities.WordEntity
+import com.example.langapp.data.repositories.CategoryTimeRepository
 import com.example.langapp.data.repositories.WordRepository
 import com.example.langapp.ui.AnimationState
 import com.example.langapp.ui.WordFilter
@@ -15,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,7 +27,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WordViewModel @Inject constructor(
-    private val wordRepository: WordRepository, private val savedStateHandle: SavedStateHandle
+    private val wordRepository: WordRepository,
+    private val savedStateHandle: SavedStateHandle,
+    private val categoryTimeRepository: CategoryTimeRepository // Добавили CategoryTimeRepository
 ) : ViewModel() {
     private val _wordUiState = MutableStateFlow(WordUiState())
     val wordUiState: StateFlow<WordUiState> = _wordUiState.asStateFlow()
@@ -34,6 +41,61 @@ class WordViewModel @Inject constructor(
     private val category: StateFlow<Int> = savedStateHandle.getStateFlow(CATEGORY_ID, 0)
     private val _allWords = MutableStateFlow<List<Word>>(emptyList())
     private val allWords: StateFlow<List<Word>> = _allWords.asStateFlow()
+
+    //region Timer
+    private var timer: CountDownTimer? = null
+    private var currentTimeSpentMillis: Long = 0
+
+    private fun initializeCategoryTime() {
+        viewModelScope.launch {
+            val categoryTime =
+                categoryTimeRepository.getCategoryTimeById(category.value).firstOrNull()
+            if (categoryTime != null) {
+                currentTimeSpentMillis = categoryTime.timeSpentMillis
+            } else {
+                // Если запись не найдена, создаем новую
+                categoryTimeRepository.insertCategoryTime(
+                    CategoryTimeEntity(
+                        categoryId = category.value
+                    )
+                )
+            }
+        }
+    }
+
+    fun startTimer() {
+        Log.d("WordViewModel", "startTimer")
+        timer = object : CountDownTimer(Long.MAX_VALUE, 1000) { // Тик каждую секунду
+            override fun onTick(millisUntilFinished: Long) {
+                currentTimeSpentMillis += 1000 // Увеличиваем на 1 секунду (1000 миллисекунд)
+                Log.d("WordViewModel", "onTick: currentTimeSpentMillis = $currentTimeSpentMillis")
+            }
+
+            override fun onFinish() {
+                // Таймер закончил работу (не должно произойти, так как Long.MAX_VALUE)
+                Log.d("WordViewModel", "onFinish")
+            }
+        }.start()
+    }
+
+    fun stopTimer() {
+        Log.d("WordViewModel", "stopTimer")
+        timer?.cancel()
+        timer = null
+        updateCategoryTime()
+    }
+
+    private fun updateCategoryTime() {
+        viewModelScope.launch {
+            val categoryTime = CategoryTimeEntity(
+                categoryId = category.value,
+                timeSpentMillis = currentTimeSpentMillis
+            )
+            Log.d("WordViewModel", "updateCategoryTime: categoryTime = $categoryTime")
+            categoryTimeRepository.updateCategoryTime(categoryTime)
+        }
+    }
+    //endregion
 
     private fun loadWords() {
         _wordUiState.update { it.copy(isLoading = true) }
@@ -175,6 +237,7 @@ class WordViewModel @Inject constructor(
     fun setCategoryId(catId: Int) {
         if (category.value != catId) {
             savedStateHandle[CATEGORY_ID] = catId
+            initializeCategoryTime()
             loadWords()
         }
     }
@@ -183,9 +246,15 @@ class WordViewModel @Inject constructor(
         return category.value
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        stopTimer()
+    }
+
     companion object {
         const val FILTER = "filter"
         const val CATEGORY_ID = "category"
         //private const val TAG = "WordViewModel"
     }
 }
+
