@@ -2,7 +2,7 @@ package com.example.langapp.constants
 
 import com.example.langapp.data.entities.WordEntity
 
-object Pronouns {
+object Pronomen {
     val wordList = listOf(
         WordEntity(catId = 4, name = "ich", transl = "я", transcr = "[ɪç]", is_important = true, is_learned = false),
         WordEntity(catId = 4, name = "du", transl = "ты", transcr = "[duː]", is_important = true, is_learned = false),

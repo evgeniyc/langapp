@@ -1,7 +1,7 @@
 package com.example.langapp.di
 
 import android.content.Context
-import androidx.room.Room
+import com.example.langapp.data.database.DatabaseInitializer
 import com.example.langapp.data.database.CategoryDao
 import com.example.langapp.data.database.CategoryTimeDao
 import com.example.langapp.data.database.LangDatabase
@@ -14,6 +14,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @Module
@@ -23,11 +25,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideLangDatabase(@ApplicationContext context: Context): LangDatabase {
-        return Room.databaseBuilder(
-            context,
-            LangDatabase::class.java,
-            "lang_database"
-        ).build()
+        return LangDatabase.getDatabase(context)
     }
 
     @Provides
@@ -61,5 +59,22 @@ object AppModule {
     @Singleton
     fun provideCategoryTimeRepository(categoryTimeDao: CategoryTimeDao): CategoryTimeRepository {
         return CategoryTimeRepository(categoryTimeDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCoroutineScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob())
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatabaseInitializer(
+        scope: CoroutineScope,
+        wordRepository: WordRepository,
+        categoryRepository: CategoryRepository,
+        //@ApplicationContext context: Context // Добавили context
+    ): DatabaseInitializer {
+        return DatabaseInitializer(scope, wordRepository, categoryRepository) // Передаем context
     }
 }
