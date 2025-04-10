@@ -29,6 +29,7 @@ object Categories {
         ),
         CategoryEntity(id = 9, name = "Farben", transl = "Цвета", transcr = "[ˈfaʁbn̩]"),
         CategoryEntity(id = 10, name = "Wetter", transl = "Погода", transcr = "[ˈvɛtɐ]"),
+        /*
         CategoryEntity(id = 11, name = "Wohnung", transl = "Квартира", transcr = "[ˈvoːnʊŋ]"),
         CategoryEntity(id = 12, name = "Möbel", transl = "Мебель", transcr = "[ˈmøːbl̩]"),
         CategoryEntity(id = 13, name = "Essen", transl = "Еда", transcr = "[ˈɛsn̩]"),
@@ -51,5 +52,6 @@ object Categories {
         CategoryEntity(id = 30, name = "Pronomen", transl = "Местоимения", transcr = "[pʁoˈnoːmən]"),
         CategoryEntity(id = 31, name = "Fragewörter", transl = "Вопросительные слова", transcr = "[ˈfʁaːɡəˌvœʁtɐ]"),
         CategoryEntity(id = 32, name = "Adverbien", transl = "Наречия", transcr = "[atˈvɛʁbi̯ən]")
+        */
     )
 }

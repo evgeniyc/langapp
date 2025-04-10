@@ -2,7 +2,7 @@ package com.example.langapp.constants
 
 import com.example.langapp.data.entities.WordEntity
 
-object Numbers {
+object Zahlen {
     val wordList = listOf(
         WordEntity(catId = 6, name = "eins", transl = "один", transcr = "[aɪ̯ns]", is_important = false, is_learned = false),
         WordEntity(catId = 6, name = "zwei", transl = "два", transcr = "[t͡svaɪ̯]", is_important = false, is_learned = false),

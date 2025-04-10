@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.langapp.data.entities.CategoryEntity
 import com.example.langapp.data.entities.CategoryTimeEntity
 import com.example.langapp.data.entities.WordEntity
+import android.util.Log
 
 @Database(
     entities = [CategoryEntity::class, WordEntity::class, CategoryTimeEntity::class],
@@ -18,8 +19,9 @@ abstract class LangDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun wordDao(): WordDao
     abstract fun categoryTimeDao(): CategoryTimeDao
-
     companion object {
+        private const val TAG = "LangDatabase"
+
         @Volatile
         private var INSTANCE: LangDatabase? = null
 
@@ -30,12 +32,12 @@ abstract class LangDatabase : RoomDatabase() {
                     LangDatabase::class.java,
                     "lang_database"
                 )
-                    .addMigrations(Migrations.MIGRATION_4_5) // Добавляем миграцию
+                    //.addCallback(sRoomDatabaseCallback)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
-    }
+        }
 }

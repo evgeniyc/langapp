@@ -1,17 +1,18 @@
 package com.example.langapp
 
 import android.app.Application
-import com.example.langapp.data.AppContainer
-import com.example.langapp.data.AppDataContainer
 import com.example.langapp.data.database.DatabaseInitializer
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
 class LangApplication : Application() {
-    lateinit var appContainer: AppContainer
+
+    @Inject
+    lateinit var databaseInitializer: DatabaseInitializer
+
     override fun onCreate() {
         super.onCreate()
-        appContainer = AppDataContainer(this)
-        DatabaseInitializer.initialize(this)
+        databaseInitializer.initialize()
     }
 }

@@ -1,146 +1,189 @@
 package com.example.langapp.data.database
 
-import android.content.Context
 import android.util.Log
 import com.example.langapp.constants.Categories
-import com.example.langapp.constants.AllWords
-import com.example.langapp.data.entities.CategoryTimeEntity
+import com.example.langapp.data.entities.CategoryEntity
 import com.example.langapp.data.entities.WordEntity
+import com.example.langapp.data.repositories.CategoryRepository
+import com.example.langapp.data.repositories.WordRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object DatabaseInitializer {
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+@Singleton
+class DatabaseInitializer @Inject constructor(
+    private val scope: CoroutineScope,
+    private val wordRepository: WordRepository,
+    private val categoryRepository: CategoryRepository,
+) {
+    companion object {
+        private const val TAG = "DatabaseInitializer"
+    }
 
-    fun initialize(context: Context) {
-        Log.d("DatabaseInitializer", "initialize called")
-        applicationScope.launch {
-            val database = LangDatabase.getDatabase(context)
-            val categoryDao = database.categoryDao()
-            val wordDao = database.wordDao()
-            val categoryTimeDao = database.categoryTimeDao()
-
-            // Проверка и добавление категорий
-            Log.d("DatabaseInitializer", "Checking if categories exist")
-            val categories = try {
-                categoryDao.getAllCategories().firstOrNull()
+    fun initialize() {
+        scope.launch {
+            try {
+                Log.d(TAG, "Initializing database...")
+                val categoriesExist = categoryRepository.getAllCategories().firstOrNull()?.isNotEmpty() ?: false
+                if (!categoriesExist) {
+                    Log.d(TAG, "Database is empty, first initialization")
+                    addFirstData(wordRepository, categoryRepository)
+                } else {
+                    Log.d(TAG, "Database exists")
+                    populateDatabase(wordRepository, categoryRepository)
+                }
+                Log.d(TAG, "Database initialized successfully")
             } catch (e: Exception) {
-                Log.e("DatabaseInitializer", "Error getting categories", e)
-                null
+                Log.e(TAG, "Error initializing database", e)
             }
-            Log.d("DatabaseInitializer", "Categories found: ${categories?.size ?: 0}")
-            if (categories.isNullOrEmpty()) {
-                Log.d("DatabaseInitializer", "No categories found, inserting categories")
-                Categories.categoryList.forEach { category ->
-                    Log.d("DatabaseInitializer", "Inserting category: ${category.name}")
-                    try {
-                        categoryDao.insertCategory(category)
-                        Log.d("DatabaseInitializer", "Category inserted: ${category.name}")
-                    } catch (e: Exception) {
-                        Log.e("DatabaseInitializer", "Error inserting category: ${category.name}", e)
-                    }
-                }
-                Log.d("DatabaseInitializer", "Finished inserting categories")
-            } else {
-                Log.d("DatabaseInitializer", "Categories already exist")
-            }
-
-            // Проверка и добавление времени для категорий
-            Log.d("DatabaseInitializer", "Checking if category times exist")
-            val categoryTimes = try {
-                categoryTimeDao.getAllCategoryTime().firstOrNull()
-            } catch (e: Exception) {
-                Log.e("DatabaseInitializer", "Error getting category times", e)
-                null
-            }
-            Log.d("DatabaseInitializer", "Category times found: ${categoryTimes?.size ?: 0}")
-            if (categoryTimes.isNullOrEmpty()) {
-                Log.d("DatabaseInitializer", "No category times found, inserting category times")
-                Categories.categoryList.forEach { category ->
-                    Log.d("DatabaseInitializer", "Inserting category time for: ${category.name}")
-                    try {
-                        categoryTimeDao.insertCategoryTime(CategoryTimeEntity(categoryId = category.id))
-                        Log.d("DatabaseInitializer", "Category time inserted for: ${category.name}")
-                    } catch (e: Exception) {
-                        Log.e("DatabaseInitializer", "Error inserting category time for: ${category.name}", e)
-                    }
-                }
-                Log.d("DatabaseInitializer", "Finished inserting category times")
-            } else {
-                Log.d("DatabaseInitializer", "Category times already exist")
-            }
-
-            // Проверка и добавление/удаление слов
-            Log.d("DatabaseInitializer", "Checking if words exist")
-            val wordsInDb = try {
-                wordDao.getAllWords().firstOrNull() ?: emptyList()
-            } catch (e: Exception) {
-                Log.e("DatabaseInitializer", "Error getting words", e)
-                emptyList()
-            }
-            Log.d("DatabaseInitializer", "Words found: ${wordsInDb.size}")
-
-            val wordsInConstants = AllWords.allWords
-            val wordsToAdd = mutableListOf<WordEntity>()
-            val wordsToDelete = mutableListOf<WordEntity>()
-
-            // Проверка на добавление
-            wordsInConstants.forEach { wordInConstants ->
-                if (!wordsInDb.any { it.name == wordInConstants.name }) {
-                    wordsToAdd.add(wordInConstants)
-                }
-            }
-            // Проверка на удаление
-            wordsInDb.forEach { wordInDb ->
-                if (!wordsInConstants.any { it.name == wordInDb.name }) {
-                    wordsToDelete.add(wordInDb)
-                }
-            }
-
-            // Добавление и удаление слов
-            addOrDeleteWords(wordDao, wordsToAdd, wordsToDelete)
         }
     }
 
-    private suspend fun addOrDeleteWords(
-        wordDao: com.example.langapp.data.database.WordDao,
-        wordsToAdd: List<WordEntity>,
-        wordsToDelete: List<WordEntity>
+    private suspend fun populateDatabase(
+        wordRepository: WordRepository,
+        categoryRepository: CategoryRepository
     ) {
-        // Добавление
-        if (wordsToAdd.isNotEmpty()) {
-            Log.d("DatabaseInitializer", "Found ${wordsToAdd.size} words to add")
-            wordsToAdd.forEach { word ->
-                Log.d("DatabaseInitializer", "Inserting word: ${word.name}")
-                try {
-                    wordDao.insertWord(word)
-                    Log.d("DatabaseInitializer", "WordEntity inserted: ${word.name}")
-                } catch (e: Exception) {
-                    Log.e("DatabaseInitializer", "Error inserting word: ${word.name}", e)
-                }
-            }
-            Log.d("DatabaseInitializer", "Finished inserting words")
+        Log.d(TAG, "Populating database...")
+        addCategories(categoryRepository)
+        val categoriesExist = categoryRepository.getAllCategories().firstOrNull()?.isNotEmpty() ?: false
+        if (categoriesExist) {
+            Log.d(TAG, "Categories exist, adding words...")
+            addWords(wordRepository, categoryRepository)
         } else {
-            Log.d("DatabaseInitializer", "All words already exist")
+            Log.e(TAG, "No categories found in database")
         }
-        // Удаление
-        if (wordsToDelete.isNotEmpty()) {
-            Log.d("DatabaseInitializer", "Found ${wordsToDelete.size} words to delete")
+        Log.d(TAG, "Populating database finished.")
+    }
+
+    private suspend fun addFirstData(
+        wordRepository: WordRepository,
+        categoryRepository: CategoryRepository
+    ) {
+        Log.d(TAG, "addFirstData...")
+        addFirstCategories(categoryRepository)
+        val categories = categoryRepository.getAllCategories().firstOrNull() ?: emptyList()
+        categories.forEach {
+            addFirstWords(wordRepository, it.name, it.id)
+        }
+        Log.d(TAG, "addFirstData finished.")
+    }
+
+    private suspend fun addCategories(categoryRepository: CategoryRepository) {
+        Log.d(TAG, "Adding categories...")
+        val existingCategoriesFlow = categoryRepository.getAllCategories()
+        val newCategories = Categories.categoryList
+        val existingCategories: List<CategoryEntity> = existingCategoriesFlow.firstOrNull() ?: emptyList()
+
+        Log.d(TAG, "Found ${existingCategories.size} existing categories")
+
+        val categoriesToAdd = newCategories.filter { newCategory ->
+            existingCategories.none { it.id == newCategory.id }
+        }
+        Log.d(TAG, "Adding ${categoriesToAdd.size} new categories")
+
+        categoriesToAdd.forEach {
+            Log.d(TAG, "Inserting category: ${it.name}")
+            categoryRepository.insertCategory(it)
+        }
+
+        val categoriesToDelete = existingCategories.filter { existingCategory ->
+            newCategories.none { it.id == existingCategory.id }
+        }
+        Log.d(TAG, "Deleting ${categoriesToDelete.size} categories")
+
+        categoriesToDelete.forEach {
+            Log.d(TAG, "Deleting category: ${it.name}")
+            categoryRepository.deleteCategory(it)
+        }
+        Log.d(TAG, "Adding categories finished.")
+    }
+
+    private suspend fun addFirstCategories(categoryRepository: CategoryRepository) {
+        Log.d(TAG, "Adding categories...")
+        val newCategories = Categories.categoryList
+        newCategories.forEach {
+            Log.d(TAG, "Inserting category: ${it.name}")
+            categoryRepository.insertCategory(it)
+        }
+        Log.d(TAG, "Adding categories finished.")
+    }
+
+    private suspend fun addWords(
+        wordRepository: WordRepository,
+        categoryRepository: CategoryRepository
+    ) {
+        Log.d(TAG, "Adding words...")
+        val categories = categoryRepository.getAllCategories().firstOrNull() ?: emptyList()
+        categories.forEach {
+            addWordsForCategory(wordRepository, it.name, it.id)
+        }
+        Log.d(TAG, "Adding words finished.")
+    }
+
+    private suspend fun addFirstWords(
+        wordRepository: WordRepository,
+        categoryName: String,
+        categoryId: Int
+    ) {
+        Log.d(TAG, "addFirstWords category: $categoryName")
+        addWordsToDatabase(wordRepository, categoryName, categoryId)
+    }
+
+    private suspend fun addWordsForCategory(
+        wordRepository: WordRepository,
+        categoryName: String,
+        categoryId: Int
+    ) {
+        Log.d(TAG, "addWordsForCategory category: $categoryName")
+        addWordsToDatabase(wordRepository, categoryName, categoryId)
+    }
+
+    private suspend fun addWordsToDatabase(
+        wordRepository: WordRepository,
+        categoryName: String,
+        categoryId: Int
+    ) {
+        val cleanedCategoryName = categoryName.replace(Regex("[^a-zA-Z]"), "")
+        try {
+            val className = "com.example.langapp.constants.$cleanedCategoryName"
+            val clazz = Class.forName(className)
+            val wordListField = clazz.getDeclaredField("wordList")
+            wordListField.isAccessible = true
+            val wordList = wordListField.get(null) as List<WordEntity>
+            // Получаем все слова из базы данных для данной категории
+            val existingWords = wordRepository.getWordsByCategoryId(categoryId).firstOrNull() ?: emptyList()
+
+            // Удаляем из базы данных слова, которых нет в wordList
+            val wordsToDelete = existingWords.filter { existingWord ->
+                wordList.none { it.name.equals(existingWord.name, ignoreCase = true) }
+            }
             wordsToDelete.forEach { word ->
-                Log.d("DatabaseInitializer", "Deleting word: ${word.name}")
-                try {
-                    wordDao.deleteWord(word)
-                    Log.d("DatabaseInitializer", "WordEntity deleted: ${word.name}")
-                } catch (e: Exception) {
-                    Log.e("DatabaseInitializer", "Error deleting word: ${word.name}", e)
+                Log.d(TAG, "Deleting word: ${word.name} in category: $categoryName")
+                wordRepository.deleteWord(word)
+            }
+            // Добавляем новые или обновляем существующие слова
+            wordList.forEach { word ->
+                val existingWord = existingWords.find { it.name.equals(word.name, ignoreCase = true) }
+                if (existingWord == null) {
+                    Log.d(TAG, "Inserting word: ${word.name} in category: $categoryName")
+                    wordRepository.insertWord(word)
+                } else {
+                    if (existingWord != word) {
+                        Log.d(TAG, "Updating word: ${word.name} in category: $categoryName")
+                        wordRepository.updateWord(word)
+                    } else {
+                        Log.d(TAG, "Word ${word.name} already exists in category: $categoryName")
+                    }
                 }
             }
-            Log.d("DatabaseInitializer", "Finished deleting words")
-        } else {
-            Log.d("DatabaseInitializer", "No words to delete")
+        } catch (e: ClassNotFoundException) {
+            Log.e(TAG, "Class not found for category: $categoryName", e)
+        } catch (e: NoSuchFieldException) {
+            Log.e(TAG, "Field 'wordList' not found in category: $categoryName", e)
+        } catch (e: IllegalAccessException) {
+            Log.e(TAG, "Illegal access to field 'wordList' in category: $categoryName", e)
         }
     }
 }
